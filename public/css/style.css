@@ -1,0 +1,1036 @@
+/* ── Foundations ─────────────────────────────────────────────────────────── */
+
+:root {
+  --ink: #0e0c16;
+  --ink-2: #16131f;
+  --ink-3: #1f1b2b;
+  --line: #2f2940;
+  --text: #e9e2d2;
+  --muted: #a39c8d;
+  --gold: #c9a55a;
+  --gold-bright: #e5c57c;
+  --danger: #e0786c;
+  --ok: #8fc79a;
+  --display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --body: 'EB Garamond', Garamond, Georgia, 'Times New Roman', serif;
+  --radius: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; background: var(--ink); }
+
+/* Moving from one page to another: the browser keeps the page being left on
+   screen until the next is ready to draw, then fades between them, so there
+   is no blank moment. (Chrome, Edge, and Safari; other browsers change pages
+   as before.) */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.16s; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(1200px 500px at 50% -100px, rgba(90, 70, 160, 0.18), transparent 70%),
+    var(--ink);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 1.1875rem;
+  line-height: 1.55;
+}
+
+h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.2; letter-spacing: 0.02em; text-wrap: balance; }
+h1 { font-size: 1.9rem; margin: 0 0 0.5rem; }
+h2 { font-size: 1.3rem; margin: 2rem 0 0.75rem; color: var(--gold-bright); }
+p { margin: 0 0 1rem; }
+
+a { color: var(--gold-bright); text-underline-offset: 0.18em; }
+a:hover { color: #fff; }
+:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
+.lede { color: var(--muted); font-size: 1.2rem; }
+.hint { color: var(--muted); font-size: 0.95rem; font-weight: 400; }
+.aside { color: var(--muted); font-size: 1.05rem; margin-top: 1.25rem; }
+.center { text-align: center; }
+.eyebrow {
+  display: block; margin: 0 0 0.35rem; font-family: var(--display); font-size: 0.78rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold);
+}
+.empty { color: var(--muted); font-style: italic; text-align: center; padding: 2.5rem 0; }
+.crumb { font-size: 1.05rem; margin-bottom: 1rem; }
+
+/* ── Masthead and page frame ─────────────────────────────────────────────── */
+
+.masthead { border-bottom: 1px solid var(--line); background: rgba(14, 12, 22, 0.9); }
+.masthead__inner {
+  max-width: 1040px; margin: 0 auto; padding: 0.8rem 1rem;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.5rem;
+}
+.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text); }
+.brand__sigil { color: var(--gold); font-size: 1.2rem; }
+.brand__name { font-family: var(--display); font-weight: 700; font-size: 1.3rem; letter-spacing: 0.08em; }
+/* The site's name at the left, the account at the right, and the pages in a
+   row of their own beneath (there are too many now to share the top row). */
+.nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.4rem; order: 3; flex-basis: 100%; }
+.nav a { color: var(--muted); text-decoration: none; font-size: 1.08rem; padding: 0.2rem 0; border-bottom: 1px solid transparent; }
+.nav a:hover { color: var(--text); }
+.nav a.is-here { color: var(--gold-bright); border-bottom-color: var(--gold); }
+.account { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+.account form { margin: 0; }
+.account__name { font-size: 1.05rem; }
+
+/* What the member holds of the four currencies (views/partials/purse.ejs). */
+.purse {
+  display: flex; align-items: center; gap: 0.75rem; margin: 0; padding: 0.3rem 0.75rem;
+  list-style: none; border: 1px solid var(--line); border-radius: 999px; background: rgba(31, 27, 43, 0.6);
+}
+.purse__stat { display: flex; align-items: center; gap: 0.3rem; cursor: default; }
+.purse__icon { width: 18px; height: 18px; flex: none; }
+.purse__n { font-size: 1rem; line-height: 1; font-variant-numeric: tabular-nums; color: var(--text); }
+/* A figure that changes when the Back Alley's wheel stops: the old and the
+   new are laid one over the other, and the one gives way to the other at the
+   moment the result is told (the same 5.1s as .fate__verdict). */
+.purse__swap { display: inline-grid; }
+.purse__swap > * { grid-area: 1 / 1; text-align: right; }
+.purse__n--before { animation: fate-told 0.6s 5.1s both reverse; }
+.purse__n--after { animation: fate-told 0.6s 5.1s both; }
+
+/* The colour of each currency, wherever its sign appears. */
+.tint--gold { color: #e5c57c; }
+.tint--attunement { color: #b9a4ff; }
+.tint--knowledge { color: #8fc4ea; }
+.tint--power { color: #f0895a; }
+
+/* Read aloud by screen readers; not shown. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+.page { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 2rem 1rem 3rem; }
+.page-head { margin-bottom: 1.5rem; }
+.page-head--row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.page-head--row .lede { margin: 0; }
+
+.colophon {
+  border-top: 1px solid var(--line); padding: 1.5rem 1rem 2rem; text-align: center;
+  color: var(--muted); font-size: 1rem;
+}
+.colophon p { margin: 0 0 0.4rem; }
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-block; padding: 0.5rem 1.05rem; border-radius: var(--radius);
+  border: 1px solid var(--gold); background: var(--gold); color: #1a1407;
+  font-family: var(--display); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.btn:hover { background: var(--gold-bright); border-color: var(--gold-bright); color: #1a1407; }
+.btn--quiet { background: transparent; color: var(--gold-bright); border-color: var(--line); }
+.btn--quiet:hover { background: var(--ink-3); color: #fff; border-color: var(--gold); }
+.btn--wide { width: 100%; padding: 0.75rem 1rem; margin-top: 0.5rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+
+.link-btn {
+  background: none; border: 0; padding: 0; font: inherit; color: var(--gold-bright);
+  text-decoration: underline; text-underline-offset: 0.18em; cursor: pointer;
+}
+.link-btn:hover { color: #fff; }
+
+.field { display: block; margin-bottom: 1.1rem; }
+.field__label { display: block; margin-bottom: 0.3rem; font-weight: 500; }
+input[type='text'], input[type='email'], input[type='password'], textarea, select {
+  width: 100%; padding: 0.6rem 0.75rem; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--ink); color: var(--text);
+  font: inherit;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(201, 165, 90, 0.25); }
+textarea { resize: vertical; min-height: 5rem; }
+input[type='file'] { font: inherit; font-size: 1rem; color: var(--muted); max-width: 100%; }
+input[type='radio'], input[type='checkbox'] { accent-color: var(--gold); width: 1.05rem; height: 1.05rem; flex: none; }
+.code-input { font-size: 2rem; letter-spacing: 0.4em; text-align: center; font-variant-numeric: tabular-nums; }
+
+.panel {
+  background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.5rem; margin-bottom: 1.5rem;
+}
+.panel--narrow { max-width: 480px; margin-left: auto; margin-right: auto; }
+.panel--medium { max-width: 620px; margin-left: auto; margin-right: auto; }
+.invite { color: var(--muted); }
+
+.notice { padding: 0.7rem 1rem; border-radius: var(--radius); border: 1px solid var(--line); background: var(--ink-2); font-size: 1.08rem; }
+.notice--error { border-color: #6d2f2a; background: #2a1414; color: #f3c3bc; }
+.notice--success { border-color: #2d5a39; background: #132218; color: #c5e6cc; }
+.notice--info { border-color: #4a4270; background: #1b1830; }
+.notice--attune {
+  position: relative; isolation: isolate;
+  border-color: var(--gold); background: #211a0c;
+  box-shadow: 0 0 18px rgba(201, 165, 90, 0.22);
+}
+/* The layer react-sparkle draws into (client/attune-sparkle.jsx). It sits
+   above the banner's background and beneath its words, so the text stays
+   legible and the link stays clickable. */
+.notice__sparkle { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+
+.ask { border: 0; margin: 0; padding: 0; min-width: 0; }
+.ask__q { padding: 0; float: left; width: 100%; margin-bottom: 0.9rem; }
+.ask__q + * { clear: both; }
+.ask__q h1 { font-size: 1.55rem; margin: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.choices--stack { flex-direction: column; }
+.choice {
+  display: flex; align-items: center; gap: 0.55rem; padding: 0.45rem 0.85rem;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink); cursor: pointer;
+}
+.choice:hover { border-color: var(--gold); }
+.choice:has(input:checked), .choice.is-chosen { border-color: var(--gold); background: #241d10; }
+.choice--button { width: 100%; padding: 0.7rem 0.95rem; font: inherit; color: inherit; text-align: left; }
+.choice--button:hover { background: var(--ink-3); }
+/* A choice not yet open to the member. */
+.choice--sealed, .choice--sealed:hover { justify-content: space-between; border-style: dashed; border-color: var(--line); color: var(--muted); cursor: default; }
+.choice__seal { font-family: var(--display); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; }
+
+/* The sections of Your Profile Card. */
+.setting { min-width: 0; margin: 0 0 1.4rem; padding: 0.9rem 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius); }
+.setting legend { padding: 0 0.4rem; font-family: var(--display); font-size: 1rem; letter-spacing: 0.06em; color: var(--gold-bright); }
+.setting .hint { margin: 0 0 0.7rem; }
+.setting .choices + .hint { margin: 0.7rem 0 0; }
+.setting__sub { margin: 0.9rem 0 0.45rem; font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.portrait-choice { flex: 1 1 130px; flex-direction: column; gap: 0.4rem; padding: 0.7rem 0.5rem; text-align: center; font-size: 1rem; line-height: 1.25; }
+.portrait-choice img, .portrait-choice__initial { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+.portrait-choice__initial { display: grid; place-items: center; background: var(--ink-3); font-family: var(--display); font-weight: 700; font-size: 1.6rem; }
+/* The round button is not shown; the whole tile is the choice. */
+.portrait-choice input { position: absolute; opacity: 0; }
+.portrait-choice:has(input:focus-visible) { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
+/* ── The Attunement and its orb ──────────────────────────────────────────── */
+
+.attune { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 1.5rem; align-items: start; }
+/* Questions slide in and out inside the panel (client/attunement.js); the
+   panel hides whatever part of them is past its edge. */
+.attune__ask { margin: 0; overflow: hidden; }
+.attune__stage h1:focus { outline: none; }
+.attune__back { margin: 1.25rem 0 0; font-size: 1.05rem; }
+
+/* The orb. Its state is a class from .orb--0 (empty) to .orb--9 (fully
+   charged), one step for each question answered. Each class sets --power
+   between 0 and 1, and everything inside is derived from that one number:
+   how visible the mists and spirals are, how fast they turn, how far the
+   glow reaches. The words beneath it and the spiral outlines come from
+   src/orb.js; the markup is views/partials/orb.ejs. */
+
+.orb-stand { margin: 0; padding-top: 0.75rem; text-align: center; }
+.orb__caption { margin-top: 0.9rem; color: var(--muted); font-style: italic; font-size: 1.02rem; }
+/* When the orb changes state, the new orb is laid over the old and faded in;
+   this lets any number of orbs occupy the same spot. */
+.orb-stack { display: grid; justify-items: center; }
+.orb-stack > .orb { grid-area: 1 / 1; margin: 0; }
+
+.orb { --power: 0; --size: 184px; position: relative; isolation: isolate; width: var(--size); margin: 0 auto; }
+.orb--1 { --power: 0.07; }
+.orb--2 { --power: 0.17; }
+.orb--3 { --power: 0.3; }
+.orb--4 { --power: 0.42; }
+.orb--5 { --power: 0.54; }
+.orb--6 { --power: 0.66; }
+.orb--7 { --power: 0.78; }
+.orb--8 { --power: 0.89; }
+.orb--9 { --power: 1; }
+
+/* The glow the orb casts about itself. It lies behind the stand, so the
+   stand keeps its colour however bright the orb becomes. */
+.orb::before {
+  content: ''; position: absolute; z-index: -2; top: 0; left: 0; width: var(--size); height: var(--size); border-radius: 50%;
+  box-shadow: 0 0 calc(var(--power) * 52px) calc(var(--power) * 12px) rgba(150, 110, 255, calc(var(--power) * 0.6));
+}
+
+.orb__glass {
+  position: relative; width: var(--size); height: var(--size); border-radius: 50%; overflow: hidden; isolation: isolate;
+  background: radial-gradient(circle at 36% 30%, #2b2643 0%, #100c1d 52%, #05040b 100%);
+  border: 1px solid rgba(196, 186, 255, 0.38);
+  box-shadow: inset 0 0 28px rgba(140, 120, 255, 0.16), inset 0 -20px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* A slow, formless fog beneath the spirals. */
+.orb__mist {
+  position: absolute; inset: -18%; border-radius: 44% 56% 60% 40% / 54% 42% 58% 46%;
+  background: conic-gradient(from 40deg at 46% 54%,
+    transparent 0 10%, rgba(110, 76, 240, 0.9) 24%, transparent 38%,
+    rgba(48, 170, 235, 0.75) 54%, transparent 68%, rgba(200, 104, 245, 0.85) 84%, transparent 96%);
+  filter: blur(11px); mix-blend-mode: screen;
+  opacity: calc(var(--power) * 0.95);
+  animation: orb-turn calc(44s - var(--power) * 32s) linear infinite;
+}
+
+.orb__spiral {
+  position: absolute; inset: -6%; width: 112%; height: 112%; mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+}
+.orb__spiral--a {
+  filter: blur(2.5px);
+  opacity: calc(var(--power) * 1.1);
+  animation: orb-turn calc(24s - var(--power) * 21s) linear infinite;
+}
+/* A second, tighter spiral winding the other way; it joins part-way through. */
+.orb__spiral--b {
+  filter: blur(1.2px);
+  opacity: calc((var(--power) - 0.3) * 1.35);
+  animation: orb-turn calc(17s - var(--power) * 15s) linear infinite reverse;
+}
+
+/* The light at the centre; it wakes in the later stages. */
+.orb__core {
+  position: absolute; inset: 27%; border-radius: 50%; mix-blend-mode: screen; filter: blur(4px);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(196, 168, 255, 0.65) 34%, transparent 70%);
+  opacity: calc((var(--power) - 0.45) * 1.8);
+  animation: orb-pulse calc(4.2s - var(--power) * 3.2s) ease-in-out infinite;
+}
+
+/* Reflections on the glass, drawn over everything inside it. */
+.orb__shine {
+  position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(ellipse 34% 24% at 31% 23%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.1) 60%, transparent 100%),
+    radial-gradient(circle at 72% 84%, rgba(186, 176, 255, 0.2) 0%, transparent 32%),
+    radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+.orb__base {
+  position: relative; z-index: -1; width: 62%; height: 30px; margin: -13px auto 0;
+  border-radius: 50% 50% 9px 9px / 70% 70% 9px 9px;
+  background: linear-gradient(180deg, #8a6a2f 0%, #5c4520 34%, #2c2010 100%);
+  border: 1px solid #a8843f; border-top-color: #d6b46a;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.55), inset 0 2px 0 rgba(255, 228, 160, 0.25);
+}
+.orb__base::after {
+  content: ''; position: absolute; left: -14%; right: -14%; bottom: -9px; height: 10px;
+  border-radius: 4px; background: linear-gradient(180deg, #6b5226, #2c2010); border: 1px solid #8a6a2f;
+}
+
+/* Each new page shows the orb one step stronger; a brief flare marks the gain. */
+.orb:not(.orb--0) { animation: orb-surge 1.4s ease-out 1; }
+
+/* In its last stages the orb will not sit still on its stand. */
+.orb--7 .orb__glass { animation: orb-tremble 1.5s linear infinite; }
+.orb--8 .orb__glass { animation: orb-tremble 0.6s linear infinite; }
+.orb--9 .orb__glass { animation: orb-rattle 0.42s linear infinite; }
+.orb--9 .orb__core { animation: orb-pulse 0.5s ease-in-out infinite; }
+
+@keyframes orb-turn { to { transform: rotate(360deg); } }
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(0.82); }
+  50% { transform: scale(1.18); }
+}
+@keyframes orb-surge {
+  0% { filter: brightness(2.1) saturate(1.3); }
+  100% { filter: brightness(1) saturate(1); }
+}
+@keyframes orb-tremble {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-0.8px, 0.5px) rotate(-0.4deg); }
+  50% { transform: translate(0.7px, -0.6px) rotate(0.3deg); }
+  75% { transform: translate(-0.5px, -0.7px) rotate(-0.3deg); }
+}
+@keyframes orb-rattle {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  10% { transform: translate(-2.5px, 1px) rotate(-1.6deg); }
+  20% { transform: translate(2px, -1.5px) rotate(1.3deg); }
+  30% { transform: translate(-1.5px, -2px) rotate(-0.8deg); }
+  40% { transform: translate(2.5px, 1.5px) rotate(1.7deg); }
+  50% { transform: translate(-2px, 0.5px) rotate(-1.2deg); }
+  60% { transform: translate(1px, 2px) rotate(0.9deg); }
+  70% { transform: translate(-2.5px, -1px) rotate(-1.7deg); }
+  80% { transform: translate(2px, 1px) rotate(0.8deg); }
+  90% { transform: translate(-1px, 2px) rotate(-1deg); }
+}
+
+.compose__row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.compose__row .field { margin: 0; }
+
+.pager { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; }
+
+/* ── Entries (posts, comments, notices) ──────────────────────────────────── */
+
+.entry {
+  --frame: var(--line);
+  --tint: var(--ink-2);
+  background: var(--tint); border: 1px solid var(--frame); border-radius: var(--radius);
+  padding: 1.1rem; margin-bottom: 1.25rem;
+}
+.entry--comment { margin-bottom: 0.9rem; }
+.entry__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.9rem; }
+.entry__time { color: var(--muted); font-size: 0.98rem; text-decoration: none; }
+a.entry__time:hover { color: var(--text); text-decoration: underline; }
+.entry__title { margin-bottom: 0.75rem; }
+.entry__body { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 0.9rem; }
+.entry__media { display: block; margin-bottom: 0.9rem; }
+.entry__media img, .entry__media video {
+  display: block; max-width: 100%; max-height: 640px; margin: 0 auto;
+  border-radius: 4px; border: 1px solid var(--line); background: #000;
+}
+.entry__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.entry__foot form { margin: 0; }
+.entry__actions { display: flex; align-items: center; gap: 1rem; font-size: 1.05rem; margin-left: auto; }
+
+/* Each discipline frames its member's words in its own manner. */
+.entry--mage {
+  --frame: rgba(170, 190, 255, 0.45);
+  --tint: linear-gradient(135deg, rgba(70, 120, 235, 0.10), rgba(150, 90, 230, 0.10));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 22px rgba(150, 170, 255, 0.07), 0 0 0 3px rgba(150, 170, 255, 0.06);
+  backdrop-filter: blur(6px);
+}
+.entry--wanderer { --frame: #8e8e90; --tint: linear-gradient(160deg, #19191d, #131316); }
+.entry--sorcerer { --frame: #8a6d2e; --tint: linear-gradient(160deg, #1a1029, #150d20); }
+.entry--warlock { --frame: #2e8c2a; --tint: linear-gradient(160deg, #170b26, #110819); box-shadow: 0 0 10px rgba(57, 255, 20, 0.08); }
+.entry--alchemist { --frame: #5d3d22; --tint: linear-gradient(160deg, #1d140d, #171009); }
+.entry--artificer { --frame: #a8822f; --tint: linear-gradient(160deg, #111a22, #0f151c); }
+
+.sigils { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.sigil {
+  display: inline-flex; align-items: center; gap: 0.3rem; min-height: 2.1rem; padding: 0.15rem 0.55rem;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--ink);
+  color: var(--text); font: inherit; font-size: 1.05rem; line-height: 1; cursor: pointer;
+}
+button.sigil:hover { border-color: var(--gold); }
+.sigil.is-mine { border-color: var(--gold); background: #2a2110; }
+.sigil--static { cursor: default; }
+.sigil__n { font-size: 0.92rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.sigil.is-mine .sigil__n { color: var(--gold-bright); }
+
+.comments h2 { margin-top: 2rem; }
+
+/* ── The profile card ────────────────────────────────────────────────────── */
+
+.card {
+  position: relative; display: flex; align-items: center; gap: 0.8rem;
+  width: 100%; max-width: 330px; min-height: 78px; padding: 0.6rem 0.9rem 0.6rem 0.6rem;
+  border-radius: 5px; border: 2px solid var(--line); background: var(--ink-3);
+  color: var(--text); text-decoration: none; overflow: hidden; isolation: isolate;
+}
+.card:hover { color: var(--text); filter: brightness(1.08); }
+/* Lies over the moving colours and under the name. It carries each card's
+   fixed ornament, and its inner shading (--inner), which would otherwise be
+   hidden beneath the colours. */
+.card__shine { position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: 2px; box-shadow: var(--inner, none); }
+
+/* The colours behind a card are never still. Two layers of soft patches in the
+   card's own colours lie beneath the name, each a square larger than the card
+   and centred on it. They turn slowly in opposite directions and at different
+   paces, so the patches pass over one another and the colours appear to mix.
+   Each kind of card supplies its patches as --flow-a and --flow-b.
+   Only `rotate` and `scale` are animated, which the browser can do without
+   redrawing anything, so a page full of cards stays smooth. */
+.card::before, .card::after {
+  content: ''; position: absolute; z-index: -2; pointer-events: none;
+  left: 50%; top: 50%; width: 400px; height: 400px; translate: -50% -50%;
+  background: var(--flow-a, none);
+  animation: card-turn 38s linear infinite, card-swell 11s ease-in-out infinite alternate;
+}
+.card::after {
+  background: var(--flow-b, none);
+  animation-duration: 53s, 15s;
+  animation-direction: reverse, alternate-reverse;
+}
+@keyframes card-turn { to { rotate: 1turn; } }
+/* Never smaller than 0.9: the square must always cover the card corner to corner. */
+@keyframes card-swell { from { scale: 0.9; } to { scale: 1.14; } }
+/* Cards down a page begin at different points, so they do not turn in step. */
+.entry:nth-of-type(3n + 2) .card::before, .entry:nth-of-type(3n + 2) .card::after { animation-delay: -13s, -4s; }
+.entry:nth-of-type(3n) .card::before, .entry:nth-of-type(3n) .card::after { animation-delay: -27s, -8s; }
+.card__portrait {
+  flex: none; width: 54px; height: 54px; border-radius: 50%; overflow: hidden;
+  display: grid; place-items: center; background: rgba(0, 0, 0, 0.35); border: 2px solid rgba(255, 255, 255, 0.25);
+}
+.card__portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card__initial { font-family: var(--display); font-weight: 700; font-size: 1.5rem; }
+.card__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.card__name { font-family: var(--display); font-weight: 700; font-size: 1.02rem; letter-spacing: 0.03em; overflow-wrap: anywhere; }
+.card__class { font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.card__pinned { font-size: 0.95rem; font-style: italic; opacity: 0.9; overflow-wrap: anywhere; }
+
+.card-showcase { display: flex; justify-content: center; margin: 1.25rem 0; }
+
+/* Wanderer (the Attunement not yet taken): a border of greyish-white granite. */
+.card--wanderer {
+  border: 6px solid transparent;
+  background:
+    linear-gradient(160deg, #232327, #18181b) padding-box,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .2 0 0 0 0 .22 0 0 0 1.6 -.62'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23g)'/%3E%3C/svg%3E") border-box #d6d5d1;
+  box-shadow: 0 0 0 1px #77767a, 0 2px 6px rgba(0, 0, 0, 0.55);
+  --inner: inset 0 0 0 1px #0d0d0f, inset 0 0 14px rgba(0, 0, 0, 0.6);
+  color: #e6e5e1;
+  --flow-a:
+    radial-gradient(circle 120px at 29% 44%, #2e2e33, transparent),
+    radial-gradient(circle 120px at 71% 57%, #111113, transparent);
+  --flow-b:
+    radial-gradient(circle 100px at 63% 33%, rgba(214, 213, 209, 0.08), transparent),
+    radial-gradient(circle 120px at 35% 66%, #232327, transparent);
+}
+.card--wanderer .card__class { color: #b9b8b4; }
+.card--wanderer .card__portrait { border-color: #a9a8a5; background: #2b2b30; }
+
+/* Mage: blue fading to purple, sparkling, as if set in clear glass. */
+.card--mage {
+  background: linear-gradient(120deg, rgba(48, 110, 235, 0.78), rgba(140, 72, 222, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(190, 205, 255, 0.14), 0 4px 18px rgba(80, 90, 220, 0.35);
+  --inner:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 0 18px rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px) saturate(1.3);
+  color: #fff;
+  --flow-a:
+    radial-gradient(circle 125px at 28% 44%, rgba(48, 110, 235, 0.95), transparent),
+    radial-gradient(circle 125px at 72% 58%, rgba(140, 72, 222, 0.95), transparent),
+    radial-gradient(circle 90px at 56% 22%, rgba(48, 110, 235, 0.8), transparent);
+  --flow-b:
+    radial-gradient(circle 130px at 36% 64%, rgba(140, 72, 222, 0.9), transparent),
+    radial-gradient(circle 115px at 68% 36%, rgba(48, 110, 235, 0.9), transparent);
+}
+.card--mage .card__shine::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(1.6px 1.6px at 12% 22%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 31% 74%, #fff, transparent 60%),
+    radial-gradient(2px 2px at 48% 16%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 63% 58%, #fff, transparent 60%),
+    radial-gradient(1.8px 1.8px at 78% 28%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 90% 78%, #fff, transparent 60%),
+    radial-gradient(1.4px 1.4px at 22% 50%, #dfe6ff, transparent 60%),
+    radial-gradient(1.4px 1.4px at 70% 88%, #f0dcff, transparent 60%),
+    linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.20) 45%, transparent 55%);
+  animation: twinkle 3.2s ease-in-out infinite alternate;
+}
+.card--mage .card__portrait { border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 0 10px rgba(255, 255, 255, 0.35); }
+.card--mage .card__class { color: #dfe6ff; }
+@keyframes twinkle { from { opacity: 0.45; } to { opacity: 1; } }
+
+/* Sorcerer: dark purple and gold; the portrait set in dark granite. */
+.card--sorcerer {
+  background: linear-gradient(135deg, #2b1450, #170a2e 70%);
+  border: 2px solid #c9a23f;
+  --inner: inset 0 0 0 1px #5d4716, inset 0 0 24px rgba(201, 162, 63, 0.14);
+  color: #f1e3b8;
+  --flow-a:
+    radial-gradient(circle 125px at 70% 56%, #2b1450, transparent),
+    radial-gradient(circle 125px at 30% 43%, #170a2e, transparent),
+    radial-gradient(circle 80px at 54% 24%, rgba(201, 162, 63, 0.16), transparent);
+  --flow-b:
+    radial-gradient(circle 120px at 35% 65%, #2b1450, transparent),
+    radial-gradient(circle 110px at 67% 35%, #170a2e, transparent),
+    radial-gradient(circle 85px at 44% 76%, rgba(201, 162, 63, 0.13), transparent);
+}
+.card--sorcerer .card__class { color: #e2bd55; }
+.card--sorcerer .card__portrait {
+  width: 60px; height: 60px; border-radius: 6px; border: 0; padding: 6px;
+  background-color: #34343b;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .55 0 0 0 0 .6 0 0 0 .9 -.25'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23g)'/%3E%3C/svg%3E");
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.22), inset -1px -1px 0 rgba(0, 0, 0, 0.7), 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+.card--sorcerer .card__portrait img,
+.card--sorcerer .card__initial { border-radius: 2px; box-shadow: 0 0 0 1px #0b0b0d, inset 0 0 6px #000; }
+.card--sorcerer .card__initial { width: 100%; height: 100%; display: grid; place-items: center; background: #1b0d33; color: #e2bd55; }
+
+/* Warlock: deep purple, a neon green frame with small streaks of red.
+   The frame moves as well. It is drawn (views/partials/card.ejs) as three
+   outlines laid one on another: a whole one in green, and two broken ones in
+   red whose streaks travel round the card in opposite directions and at
+   different paces, so that they meet, merge, and part again. */
+.card--warlock {
+  /* The frame is drawn inside the card's own edge; the padding makes room for it. */
+  border: 0; padding: calc(0.6rem + 3px) calc(0.9rem + 3px) calc(0.6rem + 3px) calc(0.6rem + 3px);
+  background: linear-gradient(135deg, #250c42, #13061f);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.35);
+  --inner: inset 0 0 18px rgba(57, 255, 20, 0.10);
+  color: #ece3ff;
+  --flow-a:
+    radial-gradient(circle 125px at 71% 57%, #250c42, transparent),
+    radial-gradient(circle 125px at 29% 43%, #13061f, transparent),
+    radial-gradient(circle 85px at 55% 23%, rgba(224, 18, 53, 0.20), transparent);
+  --flow-b:
+    radial-gradient(circle 120px at 34% 64%, #250c42, transparent),
+    radial-gradient(circle 110px at 68% 34%, #13061f, transparent),
+    radial-gradient(circle 95px at 45% 77%, rgba(57, 255, 20, 0.13), transparent);
+}
+.card__frame {
+  position: absolute; inset: 1.5px; z-index: -1; pointer-events: none; overflow: visible;
+  width: calc(100% - 3px); height: calc(100% - 3px);
+}
+.card__frame rect { fill: none; stroke: #39ff14; stroke-width: 3; }
+/* Each broken outline is measured as 100 units round; the numbers are the
+   lengths of a streak and of the gap after it, in turn, and add up to 100. */
+.card__frame .card__streaks { stroke: #e01235; animation: frame-run 34s linear infinite; }
+.card__frame .card__streaks--a { stroke-dasharray: 2.5 22.5 1.5 24.5 3 20 1.5 24.5; }
+.card__frame .card__streaks--b { stroke-dasharray: 1.5 31 2.5 35 1 29; animation-duration: 55s; animation-direction: reverse; }
+@keyframes frame-run { to { stroke-dashoffset: -100; } }
+.card--warlock .card__class { color: #62ff42; text-shadow: 0 0 8px rgba(57, 255, 20, 0.6); }
+.card--warlock .card__portrait { border-color: #39ff14; box-shadow: 0 0 8px rgba(57, 255, 20, 0.5); }
+
+/* Alchemist: deep brown, with dark red and dark green swirled throughout. */
+.card--alchemist {
+  background: #2c1a0e;
+  border: 2px solid #6e4a26;
+  --inner: inset 0 0 0 1px #1a0f07, inset 0 0 20px rgba(0, 0, 0, 0.55);
+  color: #f0e2c8;
+  /* The lower layer is a pinwheel of brown, red, and green; the upper, loose
+     patches of the red and green that drift across it the other way. */
+  --flow-a:
+    repeating-conic-gradient(from 20deg at 52% 48%,
+      #2c1a0e 0deg, #5a1616 38deg, #2c1a0e 80deg, #17431f 125deg, #2c1a0e 180deg);
+  --flow-b:
+    radial-gradient(circle 115px at 30% 44%, rgba(120, 22, 22, 0.85), transparent),
+    radial-gradient(circle 115px at 69% 58%, rgba(22, 84, 40, 0.85), transparent),
+    radial-gradient(circle 80px at 63% 27%, rgba(110, 20, 20, 0.6), transparent),
+    radial-gradient(circle 80px at 37% 73%, rgba(20, 76, 36, 0.6), transparent);
+}
+.card--alchemist::before { filter: blur(9px); }
+.card--alchemist .card__class { color: #d9a45a; }
+.card--alchemist .card__portrait { border-color: #8a6234; background: rgba(20, 10, 4, 0.6); }
+
+/* Artificer: light blue and gold, with yellow and bronze. */
+.card--artificer {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(135deg, #cfeaf8, #9fd0ec 60%, #b9def3) padding-box,
+    linear-gradient(135deg, #f7d848, #b87a2c 22%, #f1c64a 45%, #8a5a22 62%, #f7d848 80%, #b87a2c) border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --inner: inset 0 0 0 1px rgba(138, 90, 34, 0.55);
+  color: #14222c;
+  --flow-a:
+    radial-gradient(circle 125px at 70% 57%, #cfeaf8, transparent),
+    radial-gradient(circle 125px at 30% 43%, #9fd0ec, transparent),
+    radial-gradient(circle 80px at 55% 23%, rgba(247, 216, 72, 0.22), transparent);
+  --flow-b:
+    radial-gradient(circle 120px at 35% 65%, #9fd0ec, transparent),
+    radial-gradient(circle 110px at 67% 35%, #cfeaf8, transparent),
+    radial-gradient(circle 85px at 44% 77%, rgba(241, 198, 74, 0.18), transparent);
+}
+.card--artificer:hover { color: #14222c; }
+.card--artificer .card__class { color: #7a4d14; font-weight: 700; }
+.card--artificer .card__pinned { color: #2a3c48; opacity: 1; }
+.card--artificer .card__portrait { border: 3px solid #b8862f; background: #e9f5fb; box-shadow: 0 0 0 1px #f3cf4c, inset 0 0 0 1px #8a5a22; color: #7a4d14; }
+.card--artificer .card__shine {
+  /* rivets in the four corners, and a faint line of gearwork */
+  background:
+    radial-gradient(circle at 6px 6px, #8a5a22 0 2px, #f3cf4c 2px 3px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 6px) 6px, #8a5a22 0 2px, #f3cf4c 2px 3px, transparent 3.5px),
+    radial-gradient(circle at 6px calc(100% - 6px), #8a5a22 0 2px, #f3cf4c 2px 3px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 6px) calc(100% - 6px), #8a5a22 0 2px, #f3cf4c 2px 3px, transparent 3.5px),
+    repeating-linear-gradient(90deg, transparent 0 10px, rgba(184, 134, 47, 0.16) 10px 11px);
+}
+
+/* ── Adornments ──────────────────────────────────────────────────────────────
+   Items bought at the Emporium (src/shop.js), drawn by
+   views/partials/adornment.ejs. Each appears both on a profile card and on
+   the Emporium's counter. */
+
+/* A card wearing a bought border gives up the frame of its discipline: its
+   own border is removed and the bought one drawn just inside its edge. The
+   extra padding makes up the room the old border took. */
+.card.card--trimmed {
+  border: 0; padding: calc(0.6rem + 3px) calc(0.9rem + 3px) calc(0.6rem + 3px) calc(0.6rem + 3px);
+}
+.trim { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+
+/* The Gilt Border: a band of gold, across which a gleam passes now and then.
+   The band is a gold rectangle with its middle cut away by the mask. */
+.card.card--gilt-border { box-shadow: 0 0 0 1px #8a6a1c, 0 0 12px rgba(255, 205, 80, 0.45); }
+.trim--gilt {
+  padding: 4px; border-radius: 5px; overflow: hidden;
+  background: linear-gradient(135deg, #fff6c2, #f6cb45 16%, #b98a12 34%, #ffe680 50%, #c99a1e 68%, #fff1a8 84%, #d9a520);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.trim--gilt::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.95) 50%, transparent 80%);
+  translate: -120% 0; animation: gilt-gleam 5s ease-in-out infinite;
+}
+@keyframes gilt-gleam { 0%, 50% { translate: -120% 0; } 100% { translate: 340% 0; } }
+
+/* The Crimson Storm: red lightning. Three differently bent copies of the
+   outline are shown one after another, a fifth of a second each. */
+.card.card--storm-border { box-shadow: 0 0 14px rgba(255, 30, 55, 0.5); --inner: inset 0 0 16px rgba(255, 30, 55, 0.2); }
+.trim--storm {
+  inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); overflow: visible;
+  filter: drop-shadow(0 0 3px rgba(255, 40, 60, 0.95));
+}
+.trim--storm rect { fill: none; stroke-linecap: round; }
+.trim__arc { stroke: #ff2d46; stroke-width: 2.2; }
+.trim__core { stroke: #ffe1e4; stroke-width: 0.9; }
+.trim__bolt { opacity: 0; animation: bolt-flicker 0.66s steps(1, end) infinite; }
+.trim__bolt--b { animation-delay: -0.22s; }
+.trim__bolt--c { animation-delay: -0.44s; }
+/* Two of the three have breaks in them (lengths of stroke and gap, adding to 100). */
+.trim__bolt--b rect { stroke-dasharray: 34 3 21 2 28 4 6 2; }
+.trim__bolt--c rect { stroke-dasharray: 12 2 40 3 19 2 20 2; }
+@keyframes bolt-flicker { 0% { opacity: 1; } 33.4%, 100% { opacity: 0; } }
+.defs { position: absolute; }
+
+/* The Winged Eye. On a card it keeps to the upper right corner. */
+.eye { display: block; width: 100%; height: auto; overflow: visible; }
+.eye__feathers { fill: #e6e1f7; stroke: #6f62a8; stroke-width: 1; stroke-linejoin: round; }
+.eye__quills { fill: none; stroke: #9a8fd0; stroke-width: 0.8; stroke-linecap: round; }
+.eye__ball { fill: #f6f1e7; stroke: #3b2f5c; stroke-width: 1.2; }
+.eye__veins { fill: none; stroke: #d98a8a; stroke-width: 0.6; stroke-linecap: round; }
+.eye__iris { fill: #3f9bdc; stroke: #1d4f80; stroke-width: 1; }
+.eye__pupil { fill: #0b0b12; }
+.eye__glint { fill: #fff; }
+/* The lid is the size of the whole eye, and is kept flattened against its
+   upper edge except for the moment of a blink. */
+.eye__lid {
+  fill: #4a3a78; stroke: #3b2f5c; stroke-width: 0.8;
+  transform-origin: 36px 8.4px; transform: scaleY(0); animation: eye-blink 5.5s infinite;
+}
+@keyframes eye-blink { 0%, 90%, 100% { transform: scaleY(0); } 93%, 96% { transform: scaleY(1); } }
+.eye__wing { transform-origin: 45px 20px; animation: eye-flap 0.9s ease-in-out infinite alternate; }
+@keyframes eye-flap { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
+
+.card__charm { position: absolute; top: 6px; right: 8px; width: 46px; animation: charm-hover 3.2s ease-in-out infinite alternate; }
+@keyframes charm-hover { from { translate: 0 0; } to { translate: 0 3px; } }
+.card--charmed .card__name, .card--charmed .card__class { padding-right: 46px; }
+
+/* ── The Emporium ────────────────────────────────────────────────────────── */
+
+.vendor { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 1.5rem; align-items: center; margin-bottom: 2rem; }
+.vendor__figure { display: block; width: 100%; height: auto; }
+.vendor h2 { margin: 0 0 0.5rem; }
+.vendor p:last-child { margin-bottom: 0; }
+/* The Purveyor's eyes close briefly now and then. */
+.vendor__eyes { transform-origin: 100px 77px; animation: vendor-blink 6.5s infinite; }
+@keyframes vendor-blink { 0%, 94%, 100% { transform: scaleY(1); } 96%, 98% { transform: scaleY(0.1); } }
+.vendor__lamp { animation: twinkle 2.6s ease-in-out infinite alternate; }
+
+.wares { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+.ware {
+  display: flex; flex-direction: column; padding: 0 1rem 1.1rem; text-align: center;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2);
+  transition: border-color 0.4s;
+}
+.ware:hover, .ware:focus-within { border-color: var(--gold); }
+
+/* Where the item stands. When the ware is pointed at, a beam of light falls
+   on it from above and sparkles drift through the beam (the sparkles are
+   added by client/sparkle.jsx, the same as on the Attunement banner). */
+.ware__stage { position: relative; height: 200px; display: grid; place-items: center; padding-top: 34px; isolation: isolate; }
+.ware__beam, .ware__sparkle { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; }
+.ware__beam { z-index: -1; filter: blur(5px); }
+/* The beam itself: narrow where it enters at the top, wide where it lands. */
+.ware__beam::before {
+  content: ''; position: absolute; inset: 0 0 26px;
+  background: linear-gradient(to bottom, rgba(255, 244, 214, 0.75), rgba(255, 240, 200, 0.28) 55%, rgba(255, 240, 200, 0.1));
+  clip-path: polygon(41% 0, 59% 0, 96% 100%, 4% 100%);
+}
+/* The pool of light where it lands. */
+.ware__beam::after {
+  content: ''; position: absolute; left: 4%; right: 4%; bottom: 8px; height: 38px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 240, 200, 0.6), transparent);
+}
+.ware:hover .ware__beam, .ware:focus-within .ware__beam,
+.ware:hover .ware__sparkle, .ware:focus-within .ware__sparkle { opacity: 1; }
+.ware__item { position: relative; }
+/* A blank plaque on which a border is shown. */
+.plaque {
+  position: relative; isolation: isolate; width: 172px; height: 66px; border-radius: 5px;
+  background: linear-gradient(135deg, #262136, #15121f); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+.ware__item--charm { width: 132px; animation: charm-hover 3.2s ease-in-out infinite alternate; filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.5)); }
+
+.ware__name { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--text); }
+.ware__about { flex: 1; margin: 0 0 0.9rem; color: var(--muted); font-size: 1.02rem; line-height: 1.45; }
+.ware__price { display: flex; align-items: center; justify-content: center; gap: 0.35rem; margin: 0 0 0.8rem; font-family: var(--display); font-size: 1rem; letter-spacing: 0.04em; }
+.ware__price svg { width: 20px; height: 20px; }
+.ware__state { margin: 0; color: var(--muted); font-size: 0.98rem; line-height: 1.4; }
+.ware__state--owned { color: var(--ok); }
+.ware form { margin: 0; }
+
+/* ── The Council of Wizards ──────────────────────────────────────────────── */
+
+.council__terms { margin: 0 0 0.5rem; }
+.motion { margin-bottom: 1rem; }
+.motion__title { margin: 0 0 0.5rem; font-size: 1.3rem; line-height: 1.25; }
+.motion__body { color: var(--muted); white-space: pre-line; }
+.motion__options, .motion__results { list-style: none; margin: 0 0 0.8rem; padding: 0; display: grid; gap: 0.45rem; }
+.motion__options li { padding: 0.45rem 0.85rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink); }
+.motion__options li.is-mine { border-color: var(--gold); background: #241d10; }
+.motion__mark { margin-left: 0.4rem; font-family: var(--display); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-bright); }
+.motion__cast { margin: 0.9rem 0; }
+.motion__meta { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.98rem; }
+.motion__steward { display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; margin-top: 0.5rem; padding-top: 0.6rem; border-top: 1px solid var(--line); font-size: 1rem; }
+.motion__steward form { margin: 0; }
+.motion__verdict { margin: 0 0 0.8rem; }
+.motion__verdict strong { color: var(--gold-bright); }
+/* A decided motion: each outcome with its count, and a bar to its share. */
+.motion__results li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2rem 1rem; align-items: baseline; }
+.motion__results progress { grid-column: 1 / -1; width: 100%; height: 6px; appearance: none; border: 0; border-radius: 3px; overflow: hidden; background: var(--ink); }
+.motion__results progress::-webkit-progress-bar { background: var(--ink); }
+.motion__results progress::-webkit-progress-value { background: var(--line); }
+.motion__results progress::-moz-progress-bar { background: var(--line); }
+.motion__results li.is-carried .motion__result-text { color: var(--gold-bright); font-weight: 600; }
+.motion__results li.is-carried progress::-webkit-progress-value { background: var(--gold); }
+.motion__results li.is-carried progress::-moz-progress-bar { background: var(--gold); }
+.motion__count { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 0.98rem; }
+.motion__reward { margin: 0; font-weight: 600; }
+
+/* The Council's scroll in the Gathering Hall. When it is present the Hall is
+   two columns, the scroll at the left; on a narrow screen it goes above. */
+.page:has(.hall--with-scroll) { max-width: 1060px; }
+.hall--with-scroll { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 2.25rem; align-items: start; }
+.scroll { position: sticky; top: 1rem; color: #3a2a12; font-size: 1rem; line-height: 1.4; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55)); }
+/* The wooden rods at head and foot, with a knob at each end. */
+.scroll__rod {
+  position: relative; z-index: 1; display: block; height: 15px; margin: 0 10px; border-radius: 3px;
+  background: linear-gradient(to bottom, #a67c45, #e0c08a 30%, #8a6234 70%, #4f351a);
+}
+.scroll__rod::before, .scroll__rod::after {
+  content: ''; position: absolute; top: -3px; width: 12px; height: 21px; border-radius: 5px;
+  background: linear-gradient(to bottom, #8a6234, #c9a56a 35%, #6e4a26 75%, #3a2610);
+}
+.scroll__rod::before { left: -10px; }
+.scroll__rod::after { right: -10px; }
+/* The parchment, darker towards its edges and where it curls onto the rods. */
+.scroll__sheet {
+  margin: -5px 16px; padding: 1.3rem 0.95rem 1.2rem;
+  background: linear-gradient(to right, #cdb686, #efe1bd 10%, #f5ebd0 50%, #efe1bd 90%, #cdb686);
+  box-shadow: inset 0 12px 10px -8px rgba(80, 52, 16, 0.6), inset 0 -12px 10px -8px rgba(80, 52, 16, 0.6);
+}
+.scroll p { margin: 0; }
+.scroll a { color: #7a2b0e; }
+.scroll a:hover { color: #3a2a12; }
+.scroll__head { padding-bottom: 0.6rem; border-bottom: 1px solid rgba(80, 52, 16, 0.45); text-align: center; font-family: var(--display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.scroll__part { padding: 0.8rem 0; border-bottom: 1px solid rgba(80, 52, 16, 0.25); }
+.scroll__label { font-family: var(--display); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #7a5a2a; }
+.scroll__matter { margin: 0.2rem 0 0.4rem !important; font-weight: 600; font-size: 1.08rem; line-height: 1.3; overflow-wrap: anywhere; }
+.scroll__outcome strong { color: #7a2b0e; }
+.scroll__tally { list-style: none; margin: 0.45rem 0 0; padding: 0; font-size: 0.95rem; }
+.scroll__tally li { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.12rem 0; border-bottom: 1px dotted rgba(80, 52, 16, 0.35); font-variant-numeric: tabular-nums; }
+.scroll__tally li.is-carried { font-weight: 600; }
+.scroll__note { font-size: 0.95rem; font-style: italic; }
+.scroll__tally + .scroll__note { margin-top: 0.45rem; }
+.scroll__act { margin-top: 0.4rem !important; font-weight: 600; }
+.scroll__foot { padding-top: 0.75rem; text-align: center; font-size: 0.95rem; }
+@media (max-width: 900px) {
+  .hall--with-scroll { grid-template-columns: 1fr; gap: 1.5rem; }
+  .scroll { position: static; width: 100%; max-width: 360px; margin: 0 auto; }
+}
+
+/* ── The Back Alley ──────────────────────────────────────────────────────────
+   A murkier place than the rest of the site: brickwork behind, a sickly
+   green in place of the gold. Everything here is inside .alley. */
+
+body:has(.alley) {
+  background-color: #090b08;
+  background-image:
+    linear-gradient(rgba(6, 8, 5, 0.72), rgba(6, 8, 5, 0.93)),
+    repeating-linear-gradient(0deg, transparent 0 26px, #232b1e 26px 28px),
+    repeating-linear-gradient(90deg, transparent 0 70px, #232b1e 70px 72px);
+}
+.alley { --gold: #8fae52; --gold-bright: #b7d98a; --line: #2c3a26; }
+.alley h1 { color: #d7e3c6; }
+.alley .panel { background: rgba(13, 17, 11, 0.94); border: 1px dashed var(--line); }
+.alley .btn { background: #6f8f36; border-color: #6f8f36; color: #0a0d08; }
+.alley .btn:hover { background: var(--gold-bright); border-color: var(--gold-bright); }
+
+.broker { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 1.5rem; align-items: center; margin-bottom: 1.25rem; }
+.broker__figure { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+.broker h2 { margin: 0 0 0.5rem; }
+.broker p:last-child { margin-bottom: 0; }
+/* The one eye that shows gutters like a bad lamp. */
+.broker__eye { animation: broker-glint 5s steps(1, end) infinite; }
+@keyframes broker-glint { 0%, 100% { opacity: 1; } 46% { opacity: 0.25; } 49% { opacity: 1; } 52% { opacity: 0.15; } 55% { opacity: 1; } }
+
+.fate { text-align: center; }
+.fate h2 { margin-top: 0; }
+.fate__terms { max-width: 34rem; margin: 0 auto 0.9rem; padding-left: 1.4rem; text-align: left; }
+.fate__terms li { margin-bottom: 0.45rem; }
+.fate__taken { font-size: 1.15rem; }
+.fate__picks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; max-width: 34rem; margin: 0 auto; }
+.fate__pick {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 0.8rem 0.4rem;
+  border: 1px solid var(--line); border-radius: var(--radius); background: #0b0e09;
+  font: inherit; font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+}
+.fate__pick:hover { border-color: currentColor; background: #141a10; }
+.fate__pick svg { width: 30px; height: 30px; }
+.fate__outcome { font-size: 1.15rem; color: var(--danger); }
+.fate__outcome--won { color: var(--gold-bright); }
+.fate__tally { margin: 1.2rem 0 0; color: var(--muted); font-size: 0.98rem; }
+/* What came of the turn is told only once the wheel has stopped. */
+.fate__verdict { animation: fate-told 0.6s 5.1s both; }
+@keyframes fate-told { from { opacity: 0; } to { opacity: 1; } }
+
+/* The wheel: four quarters, one for each resource, in the order gold,
+   attunement, knowledge, power going clockwise from the top. --rest is the
+   turn that brings a quarter under the pointer. The wheel on the page only
+   shows a result the server has already decided (src/wheel.js). */
+.wheel-stand { position: relative; width: 230px; margin: 0.5rem auto 1.4rem; }
+.wheel__pointer {
+  position: absolute; z-index: 1; left: 50%; top: -6px; width: 22px; height: 26px; translate: -50% 0;
+  background: #d7e3c6; clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.7));
+}
+.wheel {
+  position: relative; width: 230px; height: 230px; border-radius: 50%;
+  background:
+    repeating-conic-gradient(#0a0d08 0 1.2deg, transparent 1.2deg 88.8deg, #0a0d08 88.8deg 90deg),
+    conic-gradient(#5e4a1c 0 90deg, #372b63 90deg 180deg, #1f4763 180deg 270deg, #63291a 270deg);
+  border: 6px solid #2c3a26; box-shadow: 0 0 0 2px #0a0d08, 0 0 26px rgba(143, 174, 82, 0.22), inset 0 0 30px rgba(0, 0, 0, 0.65);
+}
+.wheel__mark { position: absolute; left: 50%; top: 50%; width: 38px; height: 38px; margin: -19px 0 0 -19px; }
+.wheel__mark svg { display: block; width: 100%; height: 100%; }
+.wheel__mark--0 { transform: rotate(45deg) translateY(-66px) rotate(-45deg); }
+.wheel__mark--1 { transform: rotate(135deg) translateY(-66px) rotate(-135deg); }
+.wheel__mark--2 { transform: rotate(225deg) translateY(-66px) rotate(-225deg); }
+.wheel__mark--3 { transform: rotate(315deg) translateY(-66px) rotate(-315deg); }
+.wheel__hub { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #b7d98a, #3d4a33 70%); border: 2px solid #0a0d08; }
+.wheel--gold { --rest: 315deg; }
+.wheel--attunement { --rest: 225deg; }
+.wheel--knowledge { --rest: 135deg; }
+.wheel--power { --rest: 45deg; }
+.wheel--spun { animation: wheel-spin 5s cubic-bezier(0.12, 0.72, 0.1, 1) both; }
+@keyframes wheel-spin { from { rotate: 0deg; } to { rotate: calc(6turn + var(--rest)); } }
+
+@media (max-width: 640px) {
+  .broker { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .broker__figure { max-width: 150px; }
+  .fate__picks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── Notice Board ────────────────────────────────────────────────────────── */
+
+.section-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 0.5rem 1rem; margin: 2rem 0 0.9rem; }
+.section-head h2 { margin: 0; }
+.section-head .hint { margin: 0; }
+.bounties .section-head { margin-top: 0; }
+.bounties { margin-bottom: 2.5rem; }
+.bounties__terms { margin: 0 0 1rem; }
+
+/* The member's three bounties. */
+.bounty-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+.bounty {
+  display: flex; flex-direction: column; padding: 1rem 1.1rem;
+  border: 1px solid #5d4716; border-radius: var(--radius);
+  background: linear-gradient(160deg, #241d10, var(--ink-2) 70%);
+}
+.bounty__title { margin: 0 0 0.45rem; font-family: var(--display); font-weight: 500; font-size: 1.1rem; line-height: 1.25; }
+.bounty__task { flex: 1; margin: 0 0 0.8rem; color: var(--muted); font-size: 1.04rem; line-height: 1.45; }
+.bounty__progress { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.8rem; font-size: 0.95rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bounty__progress progress { flex: 1; height: 6px; appearance: none; border: 0; border-radius: 3px; overflow: hidden; background: var(--ink); }
+.bounty__progress progress::-webkit-progress-bar { background: var(--ink); }
+.bounty__progress progress::-webkit-progress-value { background: var(--gold); }
+.bounty__progress progress::-moz-progress-bar { background: var(--gold); }
+.bounty__reward { display: flex; align-items: center; gap: 0.35rem; margin: 0; font-family: var(--display); font-size: 0.98rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.bounty__reward svg { width: 20px; height: 20px; }
+/* Done: struck through and set back. */
+.bounty.is-fulfilled { border-color: #2d5a39; background: #132218; }
+.bounty.is-fulfilled .eyebrow { color: var(--ok); }
+.bounty.is-fulfilled .bounty__title { text-decoration: line-through; text-decoration-color: rgba(143, 199, 154, 0.6); color: var(--muted); }
+
+.filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+.filters a {
+  padding: 0.2rem 0.75rem; border: 1px solid var(--line); border-radius: 999px;
+  color: var(--muted); text-decoration: none; font-size: 1rem;
+}
+.filters a:hover { color: var(--text); border-color: var(--gold); }
+.filters a.is-here { color: #1a1407; background: var(--gold); border-color: var(--gold); }
+
+.notices, .articles { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.notice-card, .article-card {
+  display: flex; flex-direction: column; gap: 0.35rem; padding: 1.1rem;
+  background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius);
+  color: var(--text); text-decoration: none;
+}
+.notice-card:hover, .article-card:hover { border-color: var(--gold); color: var(--text); }
+.notice-card__cat { font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+.notice-card__title, .article-card__title { font-family: var(--display); font-size: 1.15rem; line-height: 1.25; }
+.notice-card__body, .article-card__summary { color: var(--muted); font-size: 1.05rem; overflow-wrap: anywhere; }
+.notice-card__meta, .article-card__meta { margin-top: auto; padding-top: 0.5rem; font-size: 0.95rem; color: var(--muted); }
+.notice-card__meta strong { color: var(--gold-bright); font-weight: 600; }
+
+.terms { margin: 0 0 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
+.terms dt { font-family: var(--display); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.terms dd { margin: 0.1rem 0 0.8rem; overflow-wrap: anywhere; }
+
+/* ── Advice Archive ──────────────────────────────────────────────────────── */
+
+.prose { max-width: 66ch; margin: 0 auto; }
+.prose h1 { font-size: 2.1rem; }
+.prose__meta { color: var(--muted); font-size: 1rem; }
+.prose__summary { font-size: 1.3rem; font-style: italic; color: var(--muted); padding-bottom: 1.25rem; border-bottom: 1px solid var(--line); }
+.prose li { margin-bottom: 0.55rem; }
+.prose ol, .prose ul { padding-left: 1.4rem; margin: 0 0 1rem; }
+.further { margin-top: 3rem; padding-top: 0.5rem; border-top: 1px solid var(--line); }
+
+/* ── The Steward's Address ───────────────────────────────────────────────── */
+
+.address {
+  position: relative; margin-bottom: 1.75rem; padding: 1.5rem 1.6rem 1.2rem;
+  background: linear-gradient(180deg, #221b10, #17131c 70%);
+  border: 1px solid #5d4a22; border-top: 3px solid var(--gold); border-radius: var(--radius);
+}
+.address h2 { margin: 0 0 0.3rem; font-size: 1.6rem; color: var(--text); }
+.address h2 a { color: inherit; text-decoration: none; }
+.address h2 a:hover { color: var(--gold-bright); }
+.address__meta { color: var(--muted); font-size: 0.98rem; margin-bottom: 1rem; }
+.address__body p, .address-full p { white-space: pre-line; overflow-wrap: anywhere; }
+.address__body h3, .address-full h3 { font-size: 1.12rem; color: var(--gold-bright); margin: 1.4rem 0 0.5rem; }
+.address__body > :last-child { margin-bottom: 0; }
+.address__foot {
+  display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; margin: 1rem 0 0; padding-top: 0.8rem;
+  border-top: 1px solid rgba(201, 165, 90, 0.25); font-size: 1.05rem;
+}
+.address__foot:empty { display: none; }
+.address-full__close { margin-top: 2rem; }
+.steward-tools {
+  display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; margin-top: 1.5rem; padding-top: 0.9rem;
+  border-top: 1px solid var(--line); font-size: 1.05rem;
+}
+.steward-tools form { margin: 0; }
+.panel--wide { max-width: none; }
+.articles--single { grid-template-columns: 1fr; }
+code { font-family: Consolas, Menlo, monospace; font-size: 0.9em; background: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 0 0.3em; }
+
+/* ── Profiles ────────────────────────────────────────────────────────────── */
+
+.profile { text-align: center; max-width: 560px; margin: 0 auto; }
+.post-list { list-style: none; padding: 0; margin: 0; }
+.post-list li { padding: 0.7rem 0; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
+.post-list a { overflow-wrap: anywhere; }
+
+/* ── Small screens and motion ────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  body { font-size: 1.125rem; }
+  h1 { font-size: 1.6rem; }
+  /* The account takes a row of its own: holdings at the left, name at the right. */
+  .account { flex-basis: 100%; flex-wrap: wrap; justify-content: flex-end; }
+  .purse { margin-right: auto; }
+  .panel { padding: 1.1rem; }
+  /* The orb moves above the question and shrinks. */
+  .attune { grid-template-columns: 1fr; }
+  .orb-stand { order: -1; padding-top: 0; }
+  .orb { --size: 128px; }
+  /* The Purveyor stands above his words. */
+  .vendor { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .vendor__figure { max-width: 150px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card--mage .card__shine::before { animation: none; opacity: 0.85; }
+  /* The colours behind each card, and the Warlock's frame, hold still. */
+  .card::before, .card::after, .card__frame .card__streaks { animation: none; }
+  /* Bought adornments, the Purveyor, and the Emporium's beams hold still too. */
+  .trim--gilt::after, .trim__bolt, .eye__lid, .eye__wing, .card__charm, .ware__item--charm, .vendor__eyes, .vendor__lamp { animation: none; }
+  .trim__bolt--a { opacity: 1; }
+  /* The wheel is shown at rest where it landed, and the result told at once. */
+  .wheel--spun { animation: none; rotate: var(--rest); }
+  .fate__verdict, .broker__eye, .purse__n--after { animation: none; }
+  .purse__n--before { display: none; }
+  .ware__beam, .ware__sparkle { transition: none; }
+  /* The orb still fills with mist as questions are answered, but holds still. */
+  .orb, .orb *, .orb--7 .orb__glass, .orb--8 .orb__glass, .orb--9 .orb__glass, .orb--9 .orb__core { animation: none; }
+}

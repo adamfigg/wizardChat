@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<div class="panel panel--narrow">
+  <h1>Confirm Your Address</h1>
+  <p class="lede">A six-digit code has been dispatched to <strong><%= email %></strong>. Enter it below. The code remains valid for 15 minutes. Should the address be mistaken, <a href="/signup">petition again</a> with the correct one.</p>
+  <% if (devNote) { %>
+    <p class="notice notice--info">Outgoing mail is not yet configured on this server. The message, with its code, has been written to the server console instead.</p>
+  <% } %>
+  <% if (error) { %><p class="notice notice--error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="/verify">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field">
+      <span class="field__label">Verification code</span>
+      <input class="code-input" type="text" name="code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" required autocomplete="one-time-code" autofocus>
+    </label>
+    <button class="btn btn--wide" type="submit">Confirm</button>
+  </form>
+  <form class="aside" method="post" action="/verify/resend">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    Nothing has arrived? Examine your spam folder, or <button class="link-btn" type="submit">request a new code</button>.
+  </form>
+</div>
+<%- include('partials/footer') %>

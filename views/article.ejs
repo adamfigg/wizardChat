@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/archive">← The Advice Archive</a></p>
+<article class="prose">
+  <p class="eyebrow"><%= article.category %></p>
+  <h1><%= article.title %></h1>
+  <p class="prose__meta"><%= article.author %> · <%= fullDate(Date.parse(article.date)) %> · <%= article.minutes %> minutes’ reading</p>
+  <p class="prose__summary"><%= article.summary %></p>
+  <%- article.body %>
+</article>
+<% if (others.length) { %>
+  <section class="further">
+    <h2>Further reading</h2>
+    <div class="articles">
+      <% for (const a of others) { %>
+        <a class="article-card" href="/archive/<%= a.slug %>">
+          <span class="eyebrow"><%= a.category %></span>
+          <span class="article-card__title"><%= a.title %></span>
+          <span class="article-card__summary"><%= a.summary %></span>
+        </a>
+      <% } %>
+    </div>
+  </section>
+<% } %>
+<%- include('partials/footer') %>

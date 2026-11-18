@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/notices">← The Notice Board</a></p>
+<article class="entry entry--<%= ad.author.wizard_class || 'wanderer' %>">
+  <header class="entry__head">
+    <%- include('partials/card', { who: ad.author }) %>
+    <span class="entry__time" title="<%= fullDate(ad.created_at) %>">Posted <%= timeAgo(ad.created_at) %></span>
+  </header>
+  <p class="eyebrow"><%= ad.category %></p>
+  <h1 class="entry__title"><%= ad.title %></h1>
+  <p class="entry__body"><%= ad.body %></p>
+  <dl class="terms">
+    <% if (ad.price) { %><dt>Price or terms</dt><dd><%= ad.price %></dd><% } %>
+    <dt>Means of contact</dt>
+    <dd>
+      <% if (locals.user && user.verified) { %>
+        <%= ad.contact %>
+      <% } else { %>
+        <a href="/login">Enter</a> or <a href="/signup">petition for admission</a> to see how this member may be reached.
+      <% } %>
+    </dd>
+  </dl>
+  <% if (canRemove(locals.user, ad.user_id)) { %>
+    <footer class="entry__foot"><span></span>
+      <form method="post" action="/notices/<%= ad.id %>/delete">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="link-btn" type="submit">Take down this notice</button>
+      </form>
+    </footer>
+  <% } %>
+</article>
+<%- include('partials/footer') %>

@@ -1,0 +1,43 @@
+<%# One post. Expects `post`, `full` (true on the post's own page), `back` (where reactions return to). %>
+<article class="entry entry--<%= post.author.wizard_class || 'wanderer' %>" id="post-<%= post.id %>">
+  <header class="entry__head">
+    <%- include('card', { who: post.author }) %>
+    <a class="entry__time" href="/posts/<%= post.id %>" title="<%= fullDate(post.created_at) %>"><%= timeAgo(post.created_at) %></a>
+  </header>
+  <% if (post.body) { %><p class="entry__body"><%= post.body %></p><% } %>
+  <% if (post.media_type === 'image') { %>
+    <a class="entry__media" href="/uploads/<%= post.media %>"><img src="/uploads/<%= post.media %>" alt="Image attached by <%= post.author.name %>" loading="lazy"></a>
+  <% } else if (post.media_type === 'video') { %>
+    <div class="entry__media"><video src="/uploads/<%= post.media %>" controls preload="metadata"></video></div>
+  <% } %>
+  <footer class="entry__foot">
+    <% if (locals.user && user.verified) { %>
+      <form class="sigils" method="post" action="/posts/<%= post.id %>/react">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="back" value="<%= back %>">
+        <% for (const r of REACTIONS) { %>
+          <button class="sigil <%= post.myReactions.has(r.key) ? 'is-mine' : '' %>" type="submit" name="emoji" value="<%= r.key %>" title="<%= r.label %>" aria-label="<%= r.label %><%= post.myReactions.has(r.key) ? ' (given; select to withdraw)' : '' %>">
+            <span aria-hidden="true"><%= r.emoji %></span><% if (post.reactions[r.key]) { %><span class="sigil__n"><%= post.reactions[r.key] %></span><% } %>
+          </button>
+        <% } %>
+      </form>
+    <% } else { %>
+      <div class="sigils">
+        <% for (const r of REACTIONS) { if (post.reactions[r.key]) { %>
+          <span class="sigil sigil--static" title="<%= r.label %>"><span aria-hidden="true"><%= r.emoji %></span><span class="sigil__n"><%= post.reactions[r.key] %></span></span>
+        <% } } %>
+      </div>
+    <% } %>
+    <div class="entry__actions">
+      <% if (!full) { %>
+        <a href="/posts/<%= post.id %>#comments"><%= post.comment_count === 0 ? 'Respond' : post.comment_count + (post.comment_count === 1 ? ' response' : ' responses') %></a>
+      <% } %>
+      <% if (canRemove(locals.user, post.user_id)) { %>
+        <form method="post" action="/posts/<%= post.id %>/delete">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button class="link-btn" type="submit">Withdraw</button>
+        </form>
+      <% } %>
+    </div>
+  </footer>
+</article>

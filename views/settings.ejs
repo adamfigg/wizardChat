@@ -1,0 +1,100 @@
+<%- include('partials/header') %>
+<div class="panel panel--medium">
+  <h1>Your Profile Card</h1>
+  <% if (user.wizard_class) { %>
+    <p class="lede">This card accompanies everything you post. Your discipline, <strong><%= className(user.wizard_class) %></strong>, was determined at your Attunement and governs its frame.</p>
+  <% } else { %>
+    <p class="lede">This card accompanies everything you post. You are at present a <strong>Wanderer</strong>, and your card bears the plain granite frame. <a href="/attunement">Undertake the Attunement</a> to have your discipline determined.</p>
+  <% } %>
+  <div class="card-showcase"><%- include('partials/card', { who: user }) %></div>
+
+  <form method="post" action="/settings">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+    <fieldset class="setting">
+      <legend>Inscription</legend>
+      <% if (inscriptions.open.length) { %>
+        <p class="hint">One line shown beneath your discipline, drawn from your Attunement.</p>
+        <div class="choices choices--stack">
+          <% for (const t of inscriptions.open) { %>
+            <label class="choice">
+              <input type="radio" name="pinned" value="<%= t %>" <%= user.pinned === t ? 'checked' : '' %>>
+              <span><%= t %></span>
+            </label>
+          <% } %>
+          <% for (const t of inscriptions.sealed) { %>
+            <div class="choice choice--sealed">
+              <span><%= t %></span>
+              <span class="choice__seal">Sealed</span>
+            </div>
+          <% } %>
+        </div>
+        <% if (inscriptions.sealed.length) { %>
+          <p class="hint">Sealed inscriptions are opened through progress within these halls.</p>
+        <% } %>
+      <% } else { %>
+        <p class="hint">Inscriptions are drawn from the Attunement, and become available once it is completed.</p>
+      <% } %>
+    </fieldset>
+
+    <fieldset class="setting">
+      <legend>Portrait</legend>
+      <% if (portraits.length) { %>
+        <p class="hint">The portraits of your discipline. Further portraits are opened through progress.</p>
+        <div class="choices portraits">
+          <% if (user.avatar && !user.portrait) { %>
+            <label class="choice portrait-choice">
+              <input type="radio" name="portrait" value="keep" checked>
+              <img src="/uploads/<%= user.avatar %>" alt="">
+              <span>My present portrait</span>
+            </label>
+          <% } %>
+          <% for (const p of portraits) { %>
+            <label class="choice portrait-choice">
+              <input type="radio" name="portrait" value="<%= p.key %>" <%= user.portrait === p.key ? 'checked' : '' %>>
+              <img src="<%= asset(portraitPath(p.key)) %>" alt="">
+              <span><%= p.name %></span>
+            </label>
+          <% } %>
+          <label class="choice portrait-choice">
+            <input type="radio" name="portrait" value="none" <%= !user.portrait && !user.avatar ? 'checked' : '' %>>
+            <span class="portrait-choice__initial" aria-hidden="true"><%= user.name.charAt(0).toUpperCase() %></span>
+            <span>My initial</span>
+          </label>
+        </div>
+        <% if (user.avatar && !user.portrait) { %>
+          <p class="hint">Portraits of a member’s own providing are no longer accepted. Yours remains until you choose another, and cannot afterwards be restored.</p>
+        <% } %>
+      <% } else { %>
+        <p class="hint">Portraits are granted with a discipline. Until then your card bears your initial.</p>
+      <% } %>
+    </fieldset>
+
+    <fieldset class="setting">
+      <legend>Adornments</legend>
+      <% if (adornments.some((slot) => slot.owned.length)) { %>
+        <p class="hint">What you have acquired at <a href="/emporium">the Emporium</a>. One of each kind may be worn.</p>
+        <% for (const slot of adornments) { if (slot.owned.length) { %>
+          <h2 class="setting__sub"><%= slot.name %></h2>
+          <div class="choices choices--stack">
+            <label class="choice">
+              <input type="radio" name="<%= slot.key %>" value="none" <%= !slot.worn ? 'checked' : '' %>>
+              <span><%= slot.none %></span>
+            </label>
+            <% for (const ware of slot.owned) { %>
+              <label class="choice">
+                <input type="radio" name="<%= slot.key %>" value="<%= ware.key %>" <%= slot.worn === ware.key ? 'checked' : '' %>>
+                <span><%= ware.name %></span>
+              </label>
+            <% } %>
+          </div>
+        <% } } %>
+      <% } else { %>
+        <p class="hint">You hold no adornments. They may be acquired at <a href="/emporium">the Emporium</a>.</p>
+      <% } %>
+    </fieldset>
+
+    <button class="btn btn--wide" type="submit">Amend My Card</button>
+  </form>
+</div>
+<%- include('partials/footer') %>

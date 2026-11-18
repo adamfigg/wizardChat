@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%# Tells the browser the page is dark before the stylesheet arrives, so the
+      blank moment between two pages is dark instead of white. %>
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e0c16">
+  <title><%= title %> · <%= siteName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<%= asset('/css/style.css') %>">
+</head>
+<body>
+<% const me = locals.user || null; const here = locals.path || ''; %>
+<header class="masthead">
+  <div class="masthead__inner">
+    <a class="brand" href="/">
+      <span class="brand__sigil" aria-hidden="true">✦</span>
+      <span class="brand__name"><%= siteName %></span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="/" class="<%= here === '/' || here.startsWith('/posts') ? 'is-here' : '' %>">The Gathering Hall</a>
+      <a href="/notices" class="<%= here.startsWith('/notices') ? 'is-here' : '' %>">The Notice Board</a>
+      <a href="/archive" class="<%= here.startsWith('/archive') ? 'is-here' : '' %>">The Advice Archive</a>
+      <a href="/council" class="<%= here.startsWith('/council') ? 'is-here' : '' %>">The Council of Wizards</a>
+      <a href="/emporium" class="<%= here.startsWith('/emporium') ? 'is-here' : '' %>">The Emporium</a>
+      <a href="/alley" class="<%= here.startsWith('/alley') ? 'is-here' : '' %>">The Back Alley</a>
+    </nav>
+    <div class="account">
+      <% if (me) { %>
+        <%# heldBack: winnings at the wheel, kept out of the figure until the
+            wheel on the page has stopped turning (src/routes/alley.js). %>
+        <%- include('purse', { held: holdingsOf(me.id), heldBack: locals.heldBack || null }) %>
+        <a class="account__name" href="/settings"><%= me.name %></a>
+        <form method="post" action="/logout">
+          <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+          <button class="btn btn--quiet" type="submit">Depart</button>
+        </form>
+      <% } else { %>
+        <a class="btn btn--quiet" href="/login">Enter</a>
+        <a class="btn" href="/signup">Petition for Admission</a>
+      <% } %>
+    </div>
+  </div>
+</header>
+<main class="page">
+<% const invited = me && !me.wizard_class && !here.startsWith('/attunement'); %>
+<% if (invited) { %>
+  <p class="notice notice--attune"><span class="notice__sparkle" data-sparkle aria-hidden="true"></span>You walk these halls as a Wanderer. <a href="/attunement">Undertake the Attunement</a> to have your discipline determined and your profile card framed accordingly.</p>
+<% } %>
+<%# The sparkle script, wanted by the banner above and by any page that asks
+    for it with include('partials/header', { sparkles: true }). %>
+<% if (invited || locals.sparkles) { %>
+  <script src="<%= asset('/js/sparkle.js') %>" defer></script>
+<% } %>
+<% if (locals.flash) { %>
+  <p class="notice notice--<%= flash.type %>" role="status"><%= flash.message %></p>
+<% } %>

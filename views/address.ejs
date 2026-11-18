@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/">← The Gathering Hall</a> · <a href="/addresses">All Addresses</a></p>
+<article class="prose address-full">
+  <p class="eyebrow">The Steward’s Address</p>
+  <h1><%= address.title %></h1>
+  <p class="prose__meta">
+    <a href="/wizards/<%= encodeURIComponent(address.author_name) %>"><%= address.author_name %></a>, Steward of the Conclave · <%= fullDate(address.created_at) %><% if (address.updated_at) { %> · amended <%= fullDate(address.updated_at) %><% } %>
+  </p>
+  <%- include('partials/address-body', { blocks }) %>
+  <p class="address-full__close"><a class="btn" href="/">Take it up in the Gathering Hall</a></p>
+  <% if (locals.user && user.is_admin) { %>
+    <div class="steward-tools">
+      <a href="/addresses/<%= address.id %>/edit">Amend this Address</a>
+      <form method="post" action="/addresses/<%= address.id %>/delete">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="link-btn" type="submit">Withdraw this Address</button>
+      </form>
+    </div>
+  <% } %>
+</article>
+<%- include('partials/footer') %>

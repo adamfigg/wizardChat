@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+<% const steward = locals.user && user.is_admin; %>
+<div class="page-head page-head--row">
+  <div>
+    <h1>The Council of Wizards</h1>
+    <p class="lede">Matters laid before the membership by the Stewards, and settled by vote.</p>
+  </div>
+  <% if (steward) { %><a class="btn" href="/council/new">Lay a Motion</a><% } %>
+</div>
+
+<p class="aside council__terms">Each member has one vote upon each motion, and a vote once cast cannot be altered. How the votes are falling is not disclosed until the vote has closed. Those who voted for the outcome that is carried are each granted <%= REWARD %> of one resource, chosen by lot.</p>
+
+<section aria-labelledby="open-head">
+  <h2 id="open-head">Before the Council</h2>
+  <% if (!open.length) { %>
+    <p class="empty">No motion stands before the Council at present.</p>
+  <% } %>
+  <% for (const m of open) { %>
+    <article class="panel motion" id="motion-<%= m.id %>">
+      <span class="eyebrow">Voting closes <%= timeUntil(m.closesAt) %></span>
+      <h3 class="motion__title"><%= m.title %></h3>
+      <% if (m.body) { %><p class="motion__body"><%= m.body %></p><% } %>
+
+      <% if (!locals.user) { %>
+        <ul class="motion__options">
+          <% for (const o of m.options) { %><li><%= o.text %></li><% } %>
+        </ul>
+        <p class="hint"><a href="/login">Enter the Conclave</a> to vote.</p>
+      <% } else if (m.myChoice !== null) { %>
+        <ul class="motion__options">
+          <% m.options.forEach((o, i) => { %>
+            <li class="<%= i === m.myChoice ? 'is-mine' : '' %>"><%= o.text %><% if (i === m.myChoice) { %> <span class="motion__mark">Your vote</span><% } %></li>
+          <% }) %>
+        </ul>
+        <p class="hint">Your vote is recorded. The count will be declared when voting closes.</p>
+      <% } else { %>
+        <form method="post" action="/council/<%= m.id %>/vote">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="choices choices--stack">
+            <% m.options.forEach((o, i) => { %>
+              <label class="choice">
+                <input type="radio" name="choice" value="<%= i %>" required>
+                <span><%= o.text %></span>
+              </label>
+            <% }) %>
+          </div>
+          <button class="btn motion__cast" type="submit">Cast My Vote</button>
+        </form>
+      <% } %>
+
+      <p class="motion__meta">
+        Laid by <%= m.steward %>, Steward of the Conclave · <%= m.cast === 1 ? '1 vote cast' : m.cast + ' votes cast' %>
+      </p>
+      <% if (steward) { %>
+        <div class="motion__steward">
+          <form method="post" action="/council/<%= m.id %>/close">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <button class="link-btn" type="submit">Close the vote now</button>
+          </form>
+          <form method="post" action="/council/<%= m.id %>/withdraw">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <button class="link-btn" type="submit">Withdraw the motion</button>
+          </form>
+        </div>
+      <% } %>
+    </article>
+  <% } %>
+</section>
+
+<section aria-labelledby="decided-head">
+  <h2 id="decided-head">Decided</h2>
+  <% if (!decided.length) { %>
+    <p class="empty">The Council has not yet decided any matter.</p>
+  <% } %>
+  <% for (const m of decided) { %>
+    <article class="panel motion motion--decided" id="motion-<%= m.id %>">
+      <span class="eyebrow">Decided <%= timeAgo(m.settledAt) %></span>
+      <h3 class="motion__title"><%= m.title %></h3>
+      <% if (m.body) { %><p class="motion__body"><%= m.body %></p><% } %>
+      <% if (!m.cast) { %>
+        <p class="motion__verdict">No vote was cast. The motion lapsed.</p>
+      <% } else { %>
+        <p class="motion__verdict">
+          <%= m.carried.length > 1 ? 'The Council was evenly divided. Carried jointly:' : 'Carried:' %>
+          <strong><%= m.carried.join('; ') %></strong>
+        </p>
+        <ul class="motion__results">
+          <% m.options.forEach((o, i) => { %>
+            <li class="<%= o.carried ? 'is-carried' : '' %>">
+              <span class="motion__result-text"><%= o.text %><% if (i === m.myChoice) { %> <span class="motion__mark">Your vote</span><% } %></span>
+              <span class="motion__count"><%= o.count %> · <%= o.share %>%</span>
+              <progress max="100" value="<%= o.share %>"></progress>
+            </li>
+          <% }) %>
+        </ul>
+        <% if (m.reward) { %>
+          <p class="motion__reward tint--<%= m.reward.currency %>">You voted with the prevailing party and were granted <%= m.reward.amount %> <%= m.reward.currency %>.</p>
+        <% } else if (m.myChoice !== null) { %>
+          <p class="hint">You voted otherwise. No reward is due.</p>
+        <% } %>
+      <% } %>
+      <p class="motion__meta">Laid by <%= m.steward %>, Steward of the Conclave · <%= m.cast === 1 ? '1 vote cast' : m.cast + ' votes cast' %></p>
+    </article>
+  <% } %>
+</section>
+<%- include('partials/footer') %>

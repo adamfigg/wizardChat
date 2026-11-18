@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+<div class="attune" data-attune>
+  <div class="panel attune__ask">
+    <p class="eyebrow">The Attunement · <span data-attune-count>Concluded</span></p>
+    <div class="attune__stage" data-attune-stage>
+      <h1>The Orb Has Reached Its Determination</h1>
+      <p class="lede">All <%= total %> questions are answered. Your discipline may now be received.</p>
+      <p>Once received, it is entered beneath your name and frames your profile card. It is not determined a second time, so amend any answer now if you answered in haste.</p>
+      <form method="post" action="/attunement/complete">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="btn btn--wide" type="submit">Receive My Discipline</button>
+      </form>
+      <p class="attune__back"><a href="/attunement/<%= total %>" data-attune-back>← Return to the final question</a></p>
+    </div>
+  </div>
+  <%- include('partials/orb', { level: total }) %>
+</div>
+<script src="<%= asset('/js/attunement.js') %>" defer nonce="<%= cspNonce %>"></script>
+<%- include('partials/footer') %>

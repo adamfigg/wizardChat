@@ -1,0 +1,44 @@
+<%# The scroll in the Gathering Hall: the Council's latest result, and the vote
+    now open (the one closing soonest). Expects `council`: { latest, next },
+    either of which may be null (src/council.js, forHall). %>
+<aside class="scroll" aria-label="Proclamations of the Council">
+  <span class="scroll__rod" aria-hidden="true"></span>
+  <div class="scroll__sheet">
+    <p class="scroll__head">Proclamation of the Council</p>
+
+    <% if (council.latest) { const m = council.latest; %>
+      <section class="scroll__part">
+        <p class="scroll__label">Lately decided</p>
+        <p class="scroll__matter"><%= m.title %></p>
+        <% if (!m.cast) { %>
+          <p class="scroll__outcome">No vote was cast. The motion lapsed.</p>
+        <% } else { %>
+          <p class="scroll__outcome"><%= m.carried.length > 1 ? 'Carried jointly' : 'Carried' %>: <strong><%= m.carried.join('; ') %></strong></p>
+          <ul class="scroll__tally">
+            <% for (const o of m.options) { %>
+              <li class="<%= o.carried ? 'is-carried' : '' %>"><span><%= o.text %></span><span><%= o.count %></span></li>
+            <% } %>
+          </ul>
+          <% if (m.reward) { %><p class="scroll__note">You voted with the prevailing party: <%= m.reward.amount %> <%= m.reward.currency %> granted.</p><% } %>
+        <% } %>
+      </section>
+    <% } %>
+
+    <% if (council.next) { const m = council.next; %>
+      <section class="scroll__part">
+        <p class="scroll__label">Now before the Council</p>
+        <p class="scroll__matter"><%= m.title %></p>
+        <p class="scroll__note">Voting closes <%= timeUntil(m.closesAt) %>. <%= m.myChoice !== null ? 'Your vote is recorded.' : '' %></p>
+        <% if (m.myChoice === null) { %><p class="scroll__act"><a href="/council#motion-<%= m.id %>">Cast your vote</a></p><% } %>
+      </section>
+    <% } else { %>
+      <section class="scroll__part">
+        <p class="scroll__label">Now before the Council</p>
+        <p class="scroll__note">No motion stands before the Council at present.</p>
+      </section>
+    <% } %>
+
+    <p class="scroll__foot"><a href="/council">The Council of Wizards</a></p>
+  </div>
+  <span class="scroll__rod" aria-hidden="true"></span>
+</aside>

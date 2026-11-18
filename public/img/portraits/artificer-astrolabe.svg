@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <title>The Astrolabe</title>
+  <defs>
+    <linearGradient id="air" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfeaf8"/>
+      <stop offset="1" stop-color="#9fd0ec"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#air)"/>
+  <!-- the ring it hangs by -->
+  <circle cx="48" cy="11" r="6" fill="none" stroke="#7a4d14" stroke-width="3"/>
+  <!-- the plate and its rings -->
+  <circle cx="48" cy="52" r="34" fill="#f1c64a" stroke="#7a4d14" stroke-width="3"/>
+  <circle cx="48" cy="52" r="27" fill="#e9f5fb" stroke="#7a4d14" stroke-width="2"/>
+  <circle cx="44" cy="58" r="15" fill="none" stroke="#b8862f" stroke-width="2"/>
+  <path d="M21 52h54M48 25v54" fill="none" stroke="#b8862f" stroke-width="1.500"/>
+  <!-- the degrees about its edge -->
+  <circle cx="48" cy="52" r="30.500" fill="none" stroke="#7a4d14" stroke-width="3" stroke-dasharray="1.500 6.500"/>
+  <!-- the sighting rule, and its pin -->
+  <path d="M26 70l44-36" fill="none" stroke="#7a4d14" stroke-width="6" stroke-linecap="round"/>
+  <path d="M26 70l44-36" fill="none" stroke="#b8862f" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="48" cy="52" r="4" fill="#f1c64a" stroke="#7a4d14" stroke-width="2"/>
+</svg>

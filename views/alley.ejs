@@ -1,0 +1,102 @@
+<%- include('partials/header') %>
+<%# The Back Alley. Which of three states the wheel is in is decided by the
+    server (src/routes/alley.js):
+      spun    a turn has just finished: the wheel turns and the result is told
+      wager   a stake has been taken and a resource is to be named
+      neither the member may give their word and begin %>
+<div class="alley">
+  <div class="page-head">
+    <h1>The Back Alley</h1>
+    <p class="lede">Behind the Emporium. The Conclave takes no notice of what is transacted here, and accepts no responsibility for it.</p>
+  </div>
+
+  <section class="panel broker" aria-label="The Broker">
+    <svg class="broker__figure" viewBox="0 0 200 210" role="img" aria-label="The Broker: a figure in a broad hat and a long coat, the face in shadow.">
+      <rect width="200" height="210" rx="6" fill="#0c0f0b"/>
+      <path d="M0 40h200M0 80h200M0 120h200M0 160h200M40 0v40M120 0v40M80 40v40M160 40v40M40 80v40M120 80v40M80 120v40M160 120v40" fill="none" stroke="#171d14" stroke-width="2"/>
+      <%# the coat and its collar %>
+      <path d="M48 204v-70c0-24 22-36 52-36s52 12 52 36v70z" fill="#141a11" stroke="#2f3b28" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M74 104l26 26 26-26 9 18-35 34-35-34z" fill="#1d261a" stroke="#2f3b28" stroke-width="2" stroke-linejoin="round"/>
+      <%# the face, in shadow, and the one eye that shows %>
+      <ellipse cx="100" cy="80" rx="25" ry="24" fill="#060706"/>
+      <circle class="broker__eye" cx="111" cy="79" r="3.200" fill="#b7ff6a"/>
+      <path d="M86 80h8" fill="none" stroke="#3d4a33" stroke-width="2" stroke-linecap="round"/>
+      <%# the hat %>
+      <path d="M72 60c0-24 8-38 28-38s28 14 28 38z" fill="#11160f" stroke="#2f3b28" stroke-width="2" stroke-linejoin="round"/>
+      <ellipse cx="100" cy="61" rx="56" ry="9" fill="#11160f" stroke="#2f3b28" stroke-width="2"/>
+      <path d="M73 52h54" fill="none" stroke="#4a5a3d" stroke-width="3"/>
+      <%# the crate he deals from, and a coin upon it %>
+      <rect x="18" y="176" width="164" height="30" rx="2" fill="#241b10" stroke="#4a3a24" stroke-width="2"/>
+      <path d="M60 176v30M100 176v30M140 176v30" fill="none" stroke="#4a3a24" stroke-width="1.500"/>
+      <ellipse cx="128" cy="174" rx="9" ry="3.500" fill="#c9a55a" stroke="#6e4a26" stroke-width="1.500"/>
+    </svg>
+    <div>
+      <span class="eyebrow">The Broker</span>
+      <h2>A Party Who Gives No Name</h2>
+      <p>The Broker keeps a wheel. Those with resources to spare, and those without, may put some part of them at hazard upon it.</p>
+      <p>He does not negotiate, extend credit, or return a stake once it is in his keeping.</p>
+    </div>
+  </section>
+
+  <section class="panel fate" aria-labelledby="fate-head">
+    <h2 id="fate-head">The Wheel of Fate</h2>
+
+    <div class="wheel-stand" aria-hidden="true">
+      <span class="wheel__pointer"></span>
+      <div class="wheel<%= spun ? ' wheel--spun wheel--' + spun.landed : '' %>">
+        <% resources.forEach((c, i) => { %>
+          <span class="wheel__mark wheel__mark--<%= i %> tint--<%= c.key %>"><svg viewBox="0 0 24 24"><%- c.icon %></svg></span>
+        <% }) %>
+        <span class="wheel__hub"></span>
+      </div>
+    </div>
+
+    <% if (spun) { %>
+      <div class="fate__verdict" role="status">
+        <p>You named <strong class="tint--<%= spun.pick %>"><%= byKey[spun.pick].name.toLowerCase() %></strong>. The wheel rests upon <strong class="tint--<%= spun.landed %>"><%= byKey[spun.landed].name.toLowerCase() %></strong>.</p>
+        <% if (spun.won) { %>
+          <p class="fate__outcome fate__outcome--won">Your stake of <%= spun.amount %> <%= spun.currency %> is paid back twofold: <%= spun.amount * 2 %> <%= spun.currency %>.</p>
+        <% } else { %>
+          <p class="fate__outcome">Your stake of <%= spun.amount %> <%= spun.currency %> is forfeit.</p>
+        <% } %>
+        <p><a href="/alley">Return to the wheel</a></p>
+      </div>
+
+    <% } else if (wager) { %>
+      <p class="fate__taken">The Broker has taken <strong class="tint--<%= wager.currency %>"><%= wager.amount %> <%= wager.currency %></strong> from you. It is in his keeping.</p>
+      <p>Name the resource upon which the wheel will come to rest.</p>
+      <form class="fate__picks" method="post" action="/alley/spin">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <% for (const c of resources) { %>
+          <button class="fate__pick tint--<%= c.key %>" type="submit" name="pick" value="<%= c.key %>">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><%- c.icon %></svg>
+            <span><%= c.name %></span>
+          </button>
+        <% } %>
+      </form>
+
+    <% } else { %>
+      <ol class="fate__terms">
+        <li>Give your word. The Broker then takes from you between 1 and <%= MAX_STAKE %> of one resource. He chooses which, and how much. It is not returned.</li>
+        <li>Name one of the four resources.</li>
+        <li>The wheel is spun. Should it rest upon the resource you named, your stake is paid back twofold. Should it rest elsewhere, the stake is forfeit.</li>
+      </ol>
+      <p class="hint">The wheel favours no resource above another: one turn in four is won.</p>
+      <% if (!locals.user) { %>
+        <p><a href="/login">Enter the Conclave</a> to approach the wheel.</p>
+      <% } else if (empty) { %>
+        <p class="notice">You hold nothing the Broker would take.</p>
+      <% } else { %>
+        <form method="post" action="/alley/stake">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <button class="btn" type="submit">Test Your Fate</button>
+        </form>
+      <% } %>
+    <% } %>
+
+    <% if (tally && tally.turns) { %>
+      <p class="fate__tally">Turns taken: <%= tally.turns %> · won: <%= tally.won %></p>
+    <% } %>
+  </section>
+</div>
+<%- include('partials/footer') %>

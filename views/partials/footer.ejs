@@ -1,0 +1,20 @@
+</main>
+<footer class="colophon">
+  <p><%= siteName %> is a place of refuge and discourse for practitioners of the Art. Conduct yourself as you would in another’s tower.</p>
+  <p><a href="/">The Gathering Hall</a> · <a href="/notices">The Notice Board</a> · <a href="/archive">The Advice Archive</a> · <a href="/council">The Council of Wizards</a> · <a href="/emporium">The Emporium</a> · <a href="/alley">The Back Alley</a></p>
+</footer>
+<%# Used by The Crimson Storm (partials/adornment.ejs). Each filter bends
+    whatever it is applied to out of shape, by a different pattern of noise
+    (`seed`); `scale` is how far, in pixels. They draw nothing themselves. %>
+<svg class="defs" width="0" height="0" aria-hidden="true">
+  <defs>
+    <% for (const [v, seed] of [['a', 4], ['b', 19], ['c', 57]]) { %>
+      <filter id="bolt-<%= v %>" x="-10%" y="-30%" width="120%" height="160%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.045 0.08" numOctaves="3" seed="<%= seed %>" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    <% } %>
+  </defs>
+</svg>
+</body>
+</html>

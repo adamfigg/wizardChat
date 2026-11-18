@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <title>The Crystal Staff</title>
+  <defs>
+    <linearGradient id="sky" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8c48de"/>
+      <stop offset="1" stop-color="#306eeb"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#sky)"/>
+  <!-- the light of the crystal -->
+  <circle cx="60" cy="28" r="22" fill="#fff" fill-opacity=".18"/>
+  <!-- the staff -->
+  <path d="M26 88l28-48" fill="none" stroke="#1d2a6b" stroke-width="9" stroke-linecap="round"/>
+  <path d="M26 88l28-48" fill="none" stroke="#c9b08a" stroke-width="5" stroke-linecap="round"/>
+  <!-- the claw that holds the crystal -->
+  <path d="M48 42c-4-8-2-16 4-22M62 46c8-2 14-8 16-16" fill="none" stroke="#1d2a6b" stroke-width="3.500" stroke-linecap="round"/>
+  <!-- the crystal -->
+  <path d="M62 10l11 16-11 20-11-20z" fill="#dff1ff" stroke="#1d2a6b" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M62 10v36M51 26h22" fill="none" stroke="#8fc4ea" stroke-width="1.500"/>
+  <circle cx="22" cy="24" r="1.800" fill="#fff"/>
+  <circle cx="30" cy="48" r="1.300" fill="#fff"/>
+  <circle cx="82" cy="62" r="1.600" fill="#fff"/>
+</svg>

@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<div class="panel panel--narrow center">
+  <p class="eyebrow">Your discipline has been determined</p>
+  <h1><%= info.name %></h1>
+  <p class="lede"><%= info.description %></p>
+  <div class="card-showcase"><%- include('partials/card', { who }) %></div>
+  <p>This is your profile card. It accompanies everything you post. You may add a portrait and choose your pinned feature at any time.</p>
+  <p class="btn-row">
+    <a class="btn" href="/">Proceed to the Gathering Hall</a>
+    <a class="btn btn--quiet" href="/settings">Amend My Card</a>
+  </p>
+</div>
+<%- include('partials/footer') %>

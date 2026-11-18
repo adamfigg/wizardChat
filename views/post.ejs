@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/">← The Gathering Hall</a></p>
+<%- include('partials/post', { post, full: true, back: '/posts/' + post.id }) %>
+
+<section id="comments" class="comments">
+  <h2><%= comments.length === 0 ? 'No responses as yet' : comments.length === 1 ? '1 response' : comments.length + ' responses' %></h2>
+  <% for (const c of comments) { %>
+    <article class="entry entry--comment entry--<%= c.author.wizard_class || 'wanderer' %>" id="comment-<%= c.id %>">
+      <header class="entry__head">
+        <%- include('partials/card', { who: c.author }) %>
+        <span class="entry__time" title="<%= fullDate(c.created_at) %>"><%= timeAgo(c.created_at) %></span>
+      </header>
+      <p class="entry__body"><%= c.body %></p>
+      <% if (canRemove(locals.user, c.user_id)) { %>
+        <footer class="entry__foot"><span></span>
+          <form method="post" action="/comments/<%= c.id %>/delete">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <button class="link-btn" type="submit">Withdraw</button>
+          </form>
+        </footer>
+      <% } %>
+    </article>
+  <% } %>
+
+  <div id="respond">
+  <% if (locals.user && user.verified) { %>
+    <form class="panel" method="post" action="/posts/<%= post.id %>/comments">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <label class="field">
+        <span class="field__label">Your response</span>
+        <textarea name="body" rows="3" maxlength="2000" required></textarea>
+      </label>
+      <button class="btn" type="submit">Respond</button>
+    </form>
+  <% } else if (!locals.user) { %>
+    <p class="panel invite">To respond, <a href="/signup">petition for admission</a> or <a href="/login">enter</a>.</p>
+  <% } %>
+  </div>
+</section>
+<%- include('partials/footer') %>

@@ -1,0 +1,8 @@
+<%# Renders an Address's blocks (see toBlocks in src/routes/addresses.js). Expects `blocks`. %>
+<% for (const b of blocks) { %>
+  <% if (b.type === 'heading') { %>
+    <h3><%= b.text %></h3>
+  <% } else { %>
+    <p><%= b.text %></p>
+  <% } %>
+<% } %>

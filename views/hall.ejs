@@ -1,0 +1,65 @@
+<%- include('partials/header') %>
+<%# When the Council has business, its scroll hangs at the left of the Hall
+    (above it on a narrow screen), and the page is widened to make room. %>
+<div class="hall<%= council ? ' hall--with-scroll' : '' %>">
+<% if (council) { %><%- include('partials/council-scroll', { council }) %><% } %>
+<div class="hall__feed">
+<div class="page-head">
+  <h1>The Gathering Hall</h1>
+  <p class="lede">Accounts, observations, and findings shared among practitioners.</p>
+</div>
+
+<% if (address) { %>
+  <section class="address" aria-labelledby="address-title">
+    <p class="eyebrow">The Steward’s Address</p>
+    <h2 id="address-title"><a href="/addresses/<%= address.id %>"><%= address.title %></a></h2>
+    <p class="address__meta"><%= address.author_name %>, Steward of the Conclave · <%= fullDate(address.created_at) %></p>
+    <div class="address__body"><%- include('partials/address-body', { blocks: address.blocks }) %></div>
+    <% if (address.truncated || address.earlier > 0 || (locals.user && user.is_admin)) { %>
+    <p class="address__foot">
+      <% if (address.truncated) { %><a href="/addresses/<%= address.id %>">Continue reading</a><% } %>
+      <% if (address.earlier > 0) { %><a href="/addresses">Earlier Addresses</a><% } %>
+      <% if (locals.user && user.is_admin) { %>
+        <a href="/addresses/<%= address.id %>/edit">Amend</a>
+        <a href="/addresses/new">Compose a new Address</a>
+      <% } %>
+    </p>
+    <% } %>
+  </section>
+<% } else if (locals.user && user.is_admin && page === 1) { %>
+  <p class="panel invite">No Address stands at the head of the Hall. As a Steward, you may <a href="/addresses/new">compose one</a> to set a matter before the membership.</p>
+<% } %>
+
+<% if (locals.user && user.verified) { %>
+  <form class="panel compose" method="post" action="/posts" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field">
+      <span class="field__label">Address the Hall</span>
+      <textarea name="body" rows="3" maxlength="5000" placeholder="What have you observed, wrought, or discovered?"></textarea>
+    </label>
+    <div class="compose__row">
+      <label class="field field--file">
+        <span class="field__label">Attach an image or recording <span class="hint">(JPEG, PNG, GIF, WebP, MP4, WebM · up to 50 MB)</span></span>
+        <input type="file" name="media" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm">
+      </label>
+      <button class="btn" type="submit">Post to the Hall</button>
+    </div>
+  </form>
+<% } else if (!locals.user) { %>
+  <p class="panel invite">All may read what is shared here. To post, respond, or leave a sigil, <a href="/signup">petition for admission</a> or <a href="/login">enter</a>.</p>
+<% } %>
+
+<% if (!posts.length) { %>
+  <p class="empty">The Hall stands quiet. Nothing has yet been shared.</p>
+<% } %>
+<% for (const post of posts) { %>
+  <%- include('partials/post', { post, full: false, back: (page > 1 ? '/?page=' + page : '/') + '#post-' + post.id }) %>
+<% } %>
+
+<nav class="pager" aria-label="Pages">
+  <% if (page > 1) { %><a class="btn btn--quiet" href="/?page=<%= page - 1 %>">← More recent</a><% } %>
+  <% if (hasMore) { %><a class="btn btn--quiet" href="/?page=<%= page + 1 %>">Earlier →</a><% } %>
+</nav>
+</div>
+</div>
+<%- include('partials/footer') %>

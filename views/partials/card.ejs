@@ -1,0 +1,39 @@
+<%# The profile card. Expects `who`: { name, wizard_class, pinned, and
+    optionally portrait, avatar, card_border, card_charm }.
+    card_border and card_charm are adornments bought at the Emporium; `worn`
+    answers with the item only if it is a real one for that place. %>
+<%
+  const cardCls = who.wizard_class || 'wanderer';
+  const border = worn(who.card_border, 'border');
+  const charm = worn(who.card_charm, 'charm');
+  const portrait = portraitPath(who.portrait);
+%>
+<a class="card card--<%= cardCls %><%= border ? ' card--trimmed card--' + border : '' %><%= charm ? ' card--charmed' : '' %>" href="/wizards/<%= encodeURIComponent(who.name) %>">
+  <span class="card__shine" aria-hidden="true"></span>
+  <% if (border) { %>
+    <%- include('adornment', { item: border }) %>
+  <% } else if (cardCls === 'warlock') { %>
+    <%# The Warlock's frame: a green outline, and two sets of red streaks that
+        travel round it in opposite directions (see .card__frame in style.css). %>
+    <svg class="card__frame" aria-hidden="true">
+      <rect width="100%" height="100%" rx="3.5"/>
+      <rect class="card__streaks card__streaks--a" width="100%" height="100%" rx="3.5" pathLength="100"/>
+      <rect class="card__streaks card__streaks--b" width="100%" height="100%" rx="3.5" pathLength="100"/>
+    </svg>
+  <% } %>
+  <span class="card__portrait">
+    <% if (portrait) { %>
+      <img src="<%= asset(portrait) %>" alt="" loading="lazy">
+    <% } else if (who.avatar) { %>
+      <img src="/uploads/<%= who.avatar %>" alt="" loading="lazy">
+    <% } else { %>
+      <span class="card__initial" aria-hidden="true"><%= who.name.charAt(0).toUpperCase() %></span>
+    <% } %>
+  </span>
+  <span class="card__text">
+    <span class="card__name"><%= who.name %></span>
+    <span class="card__class"><%= className(who.wizard_class) %></span>
+    <% if (who.pinned) { %><span class="card__pinned"><span aria-hidden="true">◈</span> <%= who.pinned %></span><% } %>
+  </span>
+  <% if (charm) { %><span class="card__charm" aria-hidden="true"><%- include('adornment', { item: charm }) %></span><% } %>
+</a>

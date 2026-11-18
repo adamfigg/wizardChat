@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/notices">← The Notice Board</a></p>
+<div class="panel panel--medium">
+  <h1>Post a Notice</h1>
+  <% if (error) { %><p class="notice notice--error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="/notices">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field">
+      <span class="field__label">Category</span>
+      <select name="category" required>
+        <option value="">Select…</option>
+        <% for (const c of CATEGORIES) { %>
+          <option value="<%= c %>" <%= values.category === c ? 'selected' : '' %>><%= c %></option>
+        <% } %>
+      </select>
+    </label>
+    <label class="field">
+      <span class="field__label">Heading</span>
+      <input type="text" name="title" value="<%= values.title || '' %>" minlength="4" maxlength="100" required>
+    </label>
+    <label class="field">
+      <span class="field__label">Particulars</span>
+      <textarea name="body" rows="7" minlength="10" maxlength="3000" required><%= values.body || '' %></textarea>
+      <span class="hint">Describe condition, provenance, and any terms. Be exact.</span>
+    </label>
+    <label class="field">
+      <span class="field__label">Price or terms <span class="hint">(optional)</span></span>
+      <input type="text" name="price" value="<%= values.price || '' %>" maxlength="60" placeholder="e.g. 40 gold, or exchange for reagents">
+    </label>
+    <label class="field">
+      <span class="field__label">Means of contact</span>
+      <input type="text" name="contact" value="<%= values.contact || '' %>" minlength="3" maxlength="200" required>
+      <span class="hint">Shown only to members who have entered. Do not include anything you would not wish another member to know.</span>
+    </label>
+    <button class="btn btn--wide" type="submit">Post Notice</button>
+  </form>
+</div>
+<%- include('partials/footer') %>

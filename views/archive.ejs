@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+<div class="page-head">
+  <h1>The Advice Archive</h1>
+  <p class="lede">Practical guidance on the keeping of orbs, libraries, familiars, and materials, set down for the benefit of all practitioners.</p>
+</div>
+<div class="articles">
+  <% for (const a of articles) { %>
+    <a class="article-card" href="/archive/<%= a.slug %>">
+      <span class="eyebrow"><%= a.category %></span>
+      <span class="article-card__title"><%= a.title %></span>
+      <span class="article-card__summary"><%= a.summary %></span>
+      <span class="article-card__meta"><%= fullDate(Date.parse(a.date)) %> · <%= a.minutes %> minutes’ reading</span>
+    </a>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

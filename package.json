@@ -1,0 +1,33 @@
+{
+  "name": "wizardchat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A gathering place for practitioners of the Art.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "node scripts/build-client.js",
+    "balance": "node scripts/check-balance.js",
+    "seed": "node scripts/seed.js",
+    "member": "node scripts/create-member.js",
+    "grant": "node scripts/grant.js",
+    "mail:test": "node scripts/test-mail.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^10.6.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-sparkle": "^2.0.0",
+    "torph": "^0.1.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

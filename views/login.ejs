@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+<div class="panel panel--narrow">
+  <h1>Enter the Conclave</h1>
+  <% if (error) { %><p class="notice notice--error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="/login">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field">
+      <span class="field__label">E-mail address</span>
+      <input type="email" name="email" value="<%= email %>" required autocomplete="email">
+    </label>
+    <label class="field">
+      <span class="field__label">Passphrase</span>
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <button class="btn btn--wide" type="submit">Enter</button>
+  </form>
+  <p class="aside">Not yet a member? <a href="/signup">Petition for admission</a>.</p>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+<div class="profile">
+  <div class="card-showcase"><%- include('partials/card', { who }) %></div>
+  <% if (CLASSES[who.wizard_class]) { %>
+    <p class="lede"><strong><%= CLASSES[who.wizard_class].name %>.</strong> <%= CLASSES[who.wizard_class].description %></p>
+  <% } else { %>
+    <p class="lede"><strong>Wanderer.</strong> A practitioner whose discipline has not yet been determined.</p>
+  <% } %>
+  <p class="aside">Admitted <%= fullDate(who.created_at) %><% if (who.is_admin) { %> · Steward of the Conclave<% } %></p>
+  <% if (locals.user && user.id === who.id) { %><p><a class="btn btn--quiet" href="/settings">Amend My Card</a><% if (!who.wizard_class) { %> <a class="btn" href="/attunement">Undertake the Attunement</a><% } %></p><% } %>
+</div>
+
+<section class="comments">
+  <h2>Recent posts</h2>
+  <% if (!posts.length) { %><p class="empty">This member has not yet addressed the Hall.</p><% } %>
+  <ul class="post-list">
+    <% for (const p of posts) { %>
+      <li>
+        <a href="/posts/<%= p.id %>"><%= p.body ? (p.body.length > 140 ? p.body.slice(0, 140).trimEnd() + '…' : p.body) : (p.media_type === 'video' ? 'A recording' : 'An image') %></a>
+        <span class="hint"><%= timeAgo(p.created_at) %></span>
+      </li>
+    <% } %>
+  </ul>
+</section>
+<%- include('partials/footer') %>

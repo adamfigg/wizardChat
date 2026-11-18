@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <title>The Inborn Flame</title>
+  <defs>
+    <radialGradient id="dusk" cx=".5" cy=".6" r=".7">
+      <stop offset="0" stop-color="#3a1b6b"/>
+      <stop offset="1" stop-color="#170a2e"/>
+    </radialGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#dusk)"/>
+  <circle cx="48" cy="58" r="30" fill="#c9a23f" fill-opacity=".14"/>
+  <!-- the flame -->
+  <path d="M50 10c3 15 21 23 21 44a23 23 0 0 1-46 0c0-11 7-16 9-27 5 4 7 9 7 14 5-9 8-19 9-31z" fill="#e2bd55" stroke="#5d4716" stroke-width="2.500" stroke-linejoin="round"/>
+  <path d="M48 44c2 9 11 13 11 23a11 11 0 0 1-22 0c0-7 6-11 11-23z" fill="#fff3c4"/>
+  <!-- sparks -->
+  <circle cx="22" cy="30" r="2" fill="#e2bd55"/>
+  <circle cx="76" cy="24" r="1.600" fill="#e2bd55"/>
+  <circle cx="80" cy="44" r="1.200" fill="#f1e3b8"/>
+</svg>

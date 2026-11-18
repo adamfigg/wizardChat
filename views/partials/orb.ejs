@@ -1,0 +1,27 @@
+<%# The crystal orb beside the Attunement. `level` is 0 to 9; see src/orb.js. %>
+<figure class="orb-stand">
+  <div class="orb-stack">
+  <div class="orb orb--<%= level %>" aria-hidden="true">
+    <div class="orb__glass">
+      <span class="orb__mist"></span>
+      <svg class="orb__spiral orb__spiral--a" viewBox="0 0 200 200" focusable="false">
+        <g fill="none" stroke-linecap="round">
+          <path d="<%= ORB.ARM_WIDE %>" stroke="#8f6bff" stroke-width="8"/>
+          <path d="<%= ORB.ARM_WIDE %>" stroke="#4fd0ff" stroke-width="5" transform="rotate(120 100 100)"/>
+          <path d="<%= ORB.ARM_WIDE %>" stroke="#e08bff" stroke-width="6" transform="rotate(240 100 100)"/>
+        </g>
+      </svg>
+      <svg class="orb__spiral orb__spiral--b" viewBox="0 0 200 200" focusable="false">
+        <g fill="none" stroke-linecap="round" transform="translate(200 0) scale(-1 1)">
+          <path d="<%= ORB.ARM_TIGHT %>" stroke="#f3dca0" stroke-width="3.5"/>
+          <path d="<%= ORB.ARM_TIGHT %>" stroke="#ffffff" stroke-width="2.5" transform="rotate(180 100 100)"/>
+        </g>
+      </svg>
+      <span class="orb__core"></span>
+      <span class="orb__shine"></span>
+    </div>
+    <div class="orb__base"></div>
+  </div>
+  </div>
+  <figcaption class="orb__caption"><span data-attune-caption><%= ORB.CAPTIONS[level] %></span></figcaption>
+</figure>

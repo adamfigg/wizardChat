@@ -1,0 +1,71 @@
+<%- include('partials/header') %>
+<div class="page-head">
+  <h1>The Notice Board</h1>
+  <p class="lede">Bounties offered by the Conclave, and notices posted by its members.</p>
+</div>
+
+<section class="bounties" aria-labelledby="bounties-head">
+  <div class="section-head">
+    <h2 id="bounties-head">Bounties</h2>
+    <% if (board) { %><p class="hint">Fulfilled to date: <%= board.fulfilled.toLocaleString('en-GB') %></p><% } %>
+  </div>
+  <% if (!board) { %>
+    <p class="notice">Bounties are set for each member of the Conclave: small undertakings, each rewarded in gold, attunement, knowledge, or power. <a href="/login">Enter</a> to see those set for you.</p>
+  <% } else { %>
+    <p class="aside bounties__terms">Three bounties are set for you at a time. A bounty is marked fulfilled, and its reward entered to your account, at the moment the thing is done; nothing need be claimed. When all three are fulfilled, three more are posted.</p>
+    <ul class="bounty-list">
+      <% for (const b of board.set) { %>
+        <li class="bounty<%= b.fulfilled ? ' is-fulfilled' : '' %>">
+          <span class="eyebrow"><%= b.fulfilled ? 'Fulfilled' : 'Bounty' %></span>
+          <h3 class="bounty__title"><%= b.title %></h3>
+          <p class="bounty__task"><%= b.task %></p>
+          <% if (b.goal > 1) { %>
+            <p class="bounty__progress">
+              <progress max="<%= b.goal %>" value="<%= b.done %>"></progress>
+              <span><%= b.done %> of <%= b.goal %></span>
+            </p>
+          <% } %>
+          <p class="bounty__reward tint--<%= b.currency %>">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><%- icons[b.currency] %></svg>
+            <span><%= b.amount %> <%= b.currency %></span>
+          </p>
+        </li>
+      <% } %>
+    </ul>
+  <% } %>
+</section>
+
+<section aria-labelledby="notices-head">
+  <div class="section-head">
+    <div>
+      <h2 id="notices-head">Notices from the Membership</h2>
+      <p class="hint">Goods, services, lodgings, and requests pertaining to the practitioner’s life.</p>
+    </div>
+    <a class="btn" href="/notices/new">Post a Notice</a>
+  </div>
+
+  <nav class="filters" aria-label="Categories">
+    <a class="<%= !category ? 'is-here' : '' %>" href="/notices">All notices</a>
+    <% for (const c of CATEGORIES) { %>
+      <a class="<%= category === c ? 'is-here' : '' %>" href="/notices?category=<%= encodeURIComponent(c) %>"><%= c %></a>
+    <% } %>
+  </nav>
+
+  <% if (!ads.length) { %>
+    <p class="empty">No notices are posted<%= category ? ' under this heading' : '' %> at present.</p>
+  <% } %>
+  <div class="notices">
+    <% for (const ad of ads) { %>
+      <a class="notice-card" href="/notices/<%= ad.id %>">
+        <span class="notice-card__cat"><%= ad.category %></span>
+        <span class="notice-card__title"><%= ad.title %></span>
+        <span class="notice-card__body"><%= ad.body.length > 160 ? ad.body.slice(0, 160).trimEnd() + '…' : ad.body %></span>
+        <span class="notice-card__meta">
+          <% if (ad.price) { %><strong><%= ad.price %></strong> · <% } %>
+          <%= ad.author.name %>, <%= className(ad.author.wizard_class) %> · <%= timeAgo(ad.created_at) %>
+        </span>
+      </a>
+    <% } %>
+  </div>
+</section>
+<%- include('partials/footer') %>

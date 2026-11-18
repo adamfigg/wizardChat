@@ -1,0 +1,22 @@
+# Installed packages (restored with `npm install`)
+node_modules/
+
+# Settings and secrets. .env.example is the template that is shared.
+.env
+.env.*
+!.env.example
+
+# Members' data: the database, generated passphrases, and uploaded files.
+# None of this may ever be published.
+data/
+uploads/
+*.db
+*.db-shm
+*.db-wal
+passphrase-*.txt
+
+# Local tool settings and clutter
+.claude/settings.local.json
+*.log
+.DS_Store
+Thumbs.db

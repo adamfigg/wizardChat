@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+<p class="crumb"><a href="/council">← The Council of Wizards</a></p>
+<div class="panel panel--wide">
+  <h1>Lay a Motion</h1>
+  <p class="lede">A motion is put to every member for a vote. Its result is declared on the scroll in the Gathering Hall when voting closes, and cannot be amended once laid.</p>
+  <% if (error) { %><p class="notice notice--error" role="alert"><%= error %></p><% } %>
+  <form method="post" action="/council">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label class="field">
+      <span class="field__label">The matter to be decided</span>
+      <input type="text" name="title" value="<%= values.title || '' %>" minlength="<%= LIMITS.title[0] %>" maxlength="<%= LIMITS.title[1] %>" required>
+    </label>
+    <label class="field">
+      <span class="field__label">Particulars <span class="hint">(optional)</span></span>
+      <textarea name="body" rows="4" maxlength="<%= LIMITS.body %>"><%= values.body || '' %></textarea>
+    </label>
+    <label class="field">
+      <span class="field__label">Outcomes that may be voted for</span>
+      <textarea name="options" rows="5" required><%= values.options || '' %></textarea>
+      <span class="hint">One to a line; between <%= LIMITS.options[0] %> and <%= LIMITS.options[1] %> of them.</span>
+    </label>
+    <label class="field">
+      <span class="field__label">Voting remains open for</span>
+      <select name="term" required>
+        <% for (const t of TERMS) { %>
+          <option value="<%= t.key %>" <%= (values.term || '1d') === t.key ? 'selected' : '' %>><%= t.name %></option>
+        <% } %>
+      </select>
+    </label>
+    <button class="btn btn--wide" type="submit">Lay It Before the Council</button>
+  </form>
+</div>
+<%- include('partials/footer') %>

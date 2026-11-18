@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+<%# The elements marked data-attune-* are the ones client/attunement.js works
+    with to change question without loading a new page. Without that script,
+    each answer simply loads the next page. %>
+<div class="attune" data-attune>
+  <div class="panel attune__ask">
+    <p class="eyebrow">The Attunement · <span data-attune-count>Question <%= index + 1 %> of <%= total %></span></p>
+    <div class="attune__stage" data-attune-stage>
+      <% if (index === 0) { %>
+        <p class="lede">Answer each question truthfully. Your answers determine the discipline shown beneath your name and the frame of your profile card. Until then you remain a Wanderer, and may take part as one.</p>
+      <% } %>
+      <% if (error) { %><p class="notice notice--error" role="alert"><%= error %></p><% } %>
+      <form method="post" action="/attunement/<%= index + 1 %>" data-attune-answer>
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <fieldset class="ask">
+          <legend class="ask__q"><h1><%= question.text %></h1></legend>
+          <div class="choices choices--stack">
+            <% for (const o of question.options) { %>
+              <button class="choice choice--button<%= chosen === o.value ? ' is-chosen' : '' %>" type="submit" name="answer" value="<%= o.value %>"><%= o.label %><% if (chosen === o.value) { %> <span class="hint">· your present answer</span><% } %></button>
+            <% } %>
+          </div>
+        </fieldset>
+      </form>
+      <% if (index > 0) { %>
+        <p class="attune__back"><a href="/attunement/<%= index %>" data-attune-back>← Return to the previous question</a></p>
+      <% } %>
+    </div>
+  </div>
+  <%- include('partials/orb', { level: index }) %>
+</div>
+<script src="<%= asset('/js/attunement.js') %>" defer nonce="<%= cspNonce %>"></script>
+<%- include('partials/footer') %>

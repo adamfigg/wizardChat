@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<div class="page-head page-head--row">
+  <div>
+    <h1>The Steward’s Addresses</h1>
+    <p class="lede">Matters the Stewards have set before the Conclave for discussion.</p>
+  </div>
+  <% if (locals.user && user.is_admin) { %><a class="btn" href="/addresses/new">Compose an Address</a><% } %>
+</div>
+<% if (!addresses.length) { %>
+  <p class="empty">No Address has yet been delivered.</p>
+<% } %>
+<div class="articles articles--single">
+  <% for (const a of addresses) { %>
+    <a class="article-card" href="/addresses/<%= a.id %>">
+      <span class="article-card__title"><%= a.title %></span>
+      <span class="article-card__summary"><%= a.summary %></span>
+      <span class="article-card__meta"><%= a.author_name %> · <%= fullDate(a.created_at) %></span>
+    </a>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

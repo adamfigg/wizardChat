@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <title>The Bloodline Diadem</title>
+  <defs>
+    <radialGradient id="dusk" cx=".5" cy=".45" r=".75">
+      <stop offset="0" stop-color="#3a1b6b"/>
+      <stop offset="1" stop-color="#170a2e"/>
+    </radialGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#dusk)"/>
+  <circle cx="48" cy="46" r="32" fill="#c9a23f" fill-opacity=".12"/>
+  <!-- the diadem -->
+  <path d="M20 64l-5-34 18 15 15-27 15 27 18-15-5 34z" fill="#e2bd55" stroke="#5d4716" stroke-width="2.500" stroke-linejoin="round"/>
+  <rect x="18" y="64" width="60" height="10" rx="2" fill="#c9a23f" stroke="#5d4716" stroke-width="2.500"/>
+  <!-- its stones -->
+  <circle cx="48" cy="50" r="6.500" fill="#8c48de" stroke="#5d4716" stroke-width="2"/>
+  <circle cx="46" cy="48" r="1.800" fill="#e7d6ff"/>
+  <circle cx="15" cy="30" r="3.500" fill="#f1e3b8" stroke="#5d4716" stroke-width="1.500"/>
+  <circle cx="48" cy="18" r="3.500" fill="#f1e3b8" stroke="#5d4716" stroke-width="1.500"/>
+  <circle cx="81" cy="30" r="3.500" fill="#f1e3b8" stroke="#5d4716" stroke-width="1.500"/>
+  <circle cx="30" cy="69" r="2" fill="#5d4716"/>
+  <circle cx="48" cy="69" r="2" fill="#5d4716"/>
+  <circle cx="66" cy="69" r="2" fill="#5d4716"/>
+</svg>

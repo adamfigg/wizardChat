@@ -1,0 +1,73 @@
+<%- include('partials/header', { sparkles: true }) %>
+<div class="page-head">
+  <h1>The Emporium</h1>
+  <p class="lede">Adornments for the profile card, to be had for what you have earned within these halls.</p>
+</div>
+
+<section class="panel vendor" aria-label="The Purveyor">
+  <svg class="vendor__figure" viewBox="0 0 200 210" role="img" aria-label="The Purveyor, hooded and bearded, at his counter.">
+    <ellipse cx="100" cy="100" rx="94" ry="98" fill="#1b162d"/>
+    <%# the lamp %>
+    <path d="M34 6v36" fill="none" stroke="#6e4a26" stroke-width="2"/>
+    <circle class="vendor__lamp" cx="34" cy="54" r="24" fill="#f0d48a" fill-opacity=".16"/>
+    <path d="M26 42h16l3 22H23z" fill="#f0d48a" fill-opacity=".9" stroke="#8a5a22" stroke-width="2" stroke-linejoin="round"/>
+    <%# the robe and hood %>
+    <path d="M100 22C66 22 52 58 50 96L32 180h136L150 96c-2-38-16-74-50-74z" fill="#2a2140" stroke="#4d4074" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M100 30c-22 0-34 24-36 52" fill="none" stroke="#4d4074" stroke-width="1.500" stroke-linecap="round"/>
+    <ellipse cx="100" cy="80" rx="30" ry="35" fill="#0b0912"/>
+    <g class="vendor__eyes">
+      <circle cx="88" cy="77" r="3.600" fill="#f0d48a"/>
+      <circle cx="112" cy="77" r="3.600" fill="#f0d48a"/>
+    </g>
+    <%# the beard %>
+    <path d="M77 96c3 40 13 60 23 70 10-10 20-30 23-70-8 9-38 9-46 0z" fill="#d6cfc2" stroke="#8f8878" stroke-width="1.500" stroke-linejoin="round"/>
+    <path d="M92 108c1 18 4 32 8 44M108 108c-1 18-4 32-8 44" fill="none" stroke="#8f8878" stroke-linecap="round"/>
+    <%# the counter, and his hands upon it %>
+    <rect x="6" y="170" width="188" height="34" rx="3" fill="#3a2716" stroke="#6e4a26" stroke-width="2"/>
+    <path d="M7 180h186" fill="none" stroke="#6e4a26" stroke-width="1.500"/>
+    <ellipse cx="60" cy="169" rx="14" ry="7" fill="#d9c3a5" stroke="#8f7a5c" stroke-width="1.500"/>
+    <ellipse cx="140" cy="169" rx="14" ry="7" fill="#d9c3a5" stroke="#8f7a5c" stroke-width="1.500"/>
+  </svg>
+  <div>
+    <span class="eyebrow">The Purveyor</span>
+    <h2>Osric Thimblewick</h2>
+    <p>Master Thimblewick keeps a small stock of adornments for the profile card. Each is paid for in gold, knowledge, or power, as marked.</p>
+    <p>What you acquire is yours to keep, and may be applied or set aside at any time under <a href="/settings">Your Profile Card</a>. All sales are final and are entered in the ledger of the Conclave.</p>
+  </div>
+</section>
+
+<ul class="wares">
+  <% for (const ware of wares) { %>
+    <li class="ware">
+      <div class="ware__stage">
+        <span class="ware__beam" aria-hidden="true"></span>
+        <span class="ware__sparkle" data-sparkle data-sparkle-count="28" aria-hidden="true"></span>
+        <% if (ware.slot === 'border') { %>
+          <div class="ware__item plaque"><%- include('partials/adornment', { item: ware.key }) %></div>
+        <% } else { %>
+          <div class="ware__item ware__item--charm"><%- include('partials/adornment', { item: ware.key }) %></div>
+        <% } %>
+      </div>
+      <h2 class="ware__name"><%= ware.name %></h2>
+      <p class="ware__about"><%= ware.about %></p>
+      <p class="ware__price tint--<%= ware.currency %>">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><%- ware.icon %></svg>
+        <span><%= ware.price.toLocaleString('en-GB') %> <%= ware.currencyName %></span>
+      </p>
+      <% if (!locals.user) { %>
+        <p class="ware__state"><a href="/login">Enter the Conclave</a> to trade.</p>
+      <% } else if (ware.owned) { %>
+        <p class="ware__state ware__state--owned">In your possession. <a href="/settings">Apply it to your card</a>.</p>
+      <% } else if (ware.affordable) { %>
+        <form method="post" action="/emporium/buy">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="item" value="<%= ware.key %>">
+          <button class="btn" type="submit" aria-label="Acquire <%= ware.name %>">Acquire</button>
+        </form>
+      <% } else { %>
+        <p class="ware__state">You hold <%= ware.held.toLocaleString('en-GB') %> of the <%= ware.price.toLocaleString('en-GB') %> <%= ware.currencyName %> required.</p>
+      <% } %>
+    </li>
+  <% } %>
+</ul>
+<%- include('partials/footer') %>

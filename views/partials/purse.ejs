@@ -1,0 +1,25 @@
+<%# What the logged-in member holds of the four currencies, shown at the head
+    of every page. Expects `held`: { gold, attunement, knowledge, power }, as
+    worked out by the server from the ledger (src/ledger.js). Nothing here is
+    sent back to the server; changing it in the browser changes nothing.
+
+    `heldBack` ({ currency, amount }, or null) is winnings at the Back Alley's
+    wheel. They are already in `held`, but the figure is first shown without
+    them and changes when the wheel on the page stops, so that it does not
+    give the result away (.purse__n--before and --after in style.css). %>
+<ul class="purse" aria-label="Your holdings">
+  <% for (const c of CURRENCIES) { %>
+    <li class="purse__stat tint--<%= c.key %>" title="<%= c.name %>">
+      <svg class="purse__icon" viewBox="0 0 24 24" aria-hidden="true"><%- c.icon %></svg>
+      <% if (heldBack && heldBack.currency === c.key) { %>
+        <span class="purse__swap">
+          <span class="purse__n purse__n--before" aria-hidden="true"><%= (held[c.key] - heldBack.amount).toLocaleString('en-GB') %></span>
+          <span class="purse__n purse__n--after"><%= held[c.key].toLocaleString('en-GB') %></span>
+        </span>
+      <% } else { %>
+        <span class="purse__n"><%= held[c.key].toLocaleString('en-GB') %></span>
+      <% } %>
+      <span class="sr-only"><%= c.name %></span>
+    </li>
+  <% } %>
+</ul>

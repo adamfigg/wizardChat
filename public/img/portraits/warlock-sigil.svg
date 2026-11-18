@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <title>The Sigil of the Pact</title>
+  <defs>
+    <radialGradient id="pit" cx=".5" cy=".5" r=".7">
+      <stop offset="0" stop-color="#34115c"/>
+      <stop offset="1" stop-color="#13061f"/>
+    </radialGradient>
+  </defs>
+  <rect width="96" height="96" fill="url(#pit)"/>
+  <!-- the bounding circles -->
+  <circle cx="48" cy="48" r="38" fill="none" stroke="#39ff14" stroke-width="3"/>
+  <circle cx="48" cy="48" r="32" fill="none" stroke="#39ff14" stroke-width="1.200" stroke-dasharray="3 5"/>
+  <!-- the two triangles -->
+  <path d="M48 16l27.700 48H20.300z" fill="none" stroke="#39ff14" stroke-width="2.500" stroke-linejoin="round"/>
+  <path d="M48 80L20.300 32h55.400z" fill="none" stroke="#e01235" stroke-width="2" stroke-linejoin="round"/>
+  <!-- the eye at the centre -->
+  <path d="M34 48c5-7 9-10 14-10s9 3 14 10c-5 7-9 10-14 10s-9-3-14-10z" fill="#13061f" stroke="#39ff14" stroke-width="2.500" stroke-linejoin="round"/>
+  <circle cx="48" cy="48" r="4.500" fill="#e01235"/>
+  <circle cx="48" cy="48" r="1.600" fill="#13061f"/>
+</svg>
